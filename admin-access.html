@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin access — FRAMEY.PK</title>
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#14110f" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+<main class="gate">
+  <div class="gate__card">
+    <div class="gate__mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <path d="M3 15.5 8 10l4.5 4.5L16 11l5 4.5" />
+        <path d="M12 8.5v.01" />
+      </svg>
+    </div>
+
+    <h1 class="gate__title">Store <em>Admin</em></h1>
+    <p class="gate__sub">Sign in to manage orders, products and pricing.</p>
+
+    <p class="note note--err" id="bootError" hidden></p>
+
+    <form id="gateForm" novalidate>
+      <div class="gate__field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="username"
+               placeholder="you@example.com" required />
+      </div>
+
+      <div class="gate__field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password"
+               placeholder="••••••••" required minlength="6" />
+      </div>
+
+      <div class="gate__field" id="confirmField" hidden>
+        <label for="confirm">Confirm password</label>
+        <input id="confirm" name="confirm" type="password" autocomplete="new-password"
+               placeholder="••••••••" />
+      </div>
+
+      <p class="gate__msg gate__msg--err" id="errMsg" role="alert" hidden></p>
+      <p class="gate__msg gate__msg--ok" id="okMsg" role="status" hidden></p>
+
+      <button class="gate__btn" id="submitBtn" type="submit">Sign in</button>
+    </form>
+
+    <div class="gate__foot">
+      <button class="gate__linkBtn" id="modeBtn" type="button" hidden>Need an account? Create the owner login</button>
+      <a href="index.html">&larr; Back to the store</a>
+    </div>
+
+    <div class="gate__hint" id="setupHint" hidden>
+      <strong>First-time setup</strong><br />
+      1. Run <code>supabase.sql</code> in the Supabase SQL editor.<br />
+      2. Put your project URL + anon key into <code>config.js</code>.<br />
+      3. Add your email to the <code>admin_invites</code> table (the last line of the SQL),<br />
+      &nbsp;&nbsp;&nbsp;then use &ldquo;Create the owner login&rdquo; below.
+    </div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="supabase-client.js"></script>
+<script>
+/* ==========================================================================
+   Gate logic. Nothing here contains a password: the credentials are checked
+   by Supabase Auth and the panel's data is protected by Row Level Security.
+   ========================================================================== */
+(function () {
+  "use strict";
+
+  var $ = function (s) { return document.querySelector(s); };
+
+  var form      = $("#gateForm");
+  var emailEl   = $("#email");
+  var passEl    = $("#password");
+  var confirmEl = $("#confirm");
+  var confirmF  = $("#confirmField");
+  var submitBtn = $("#submitBtn");
+  var errMsg    = $("#errMsg");
+  var okMsg     = $("#okMsg");
+  var bootError = $("#bootError");
+  var modeBtn   = $("#modeBtn");
+  var setupHint = $("#setupHint");
+
+  var mode = "signin";           // "signin" | "signup"
+  var client = window.FrameySupabase.get();
+
+  function show(node, text) {
+    if (!text) { node.hidden = true; node.textContent = ""; return; }
+    node.hidden = false;
+    node.textContent = text;
+  }
+
+  function setBusy(busy, label) {
+    submitBtn.disabled = busy;
+    submitBtn.textContent = label || (busy ? "Please wait…" : "Sign in");
+  }
+
+  /* No Supabase client -> nothing can work, so say why instead of failing
+     with a confusing network error. */
+  if (!client) {
+    var why = window.FrameySupabase.reason();
+    show(bootError,
+      "Cannot reach the admin backend. " + why.charAt(0).toUpperCase() + why.slice(1) + ".");
+    setupHint.hidden = false;
+    form.hidden = true;
+    modeBtn.hidden = true;
+    return;
+  }
+
+  setupHint.hidden = true;
+
+  /* Already signed in? Go straight through. */
+  client.auth.getSession().then(function (res) {
+    if (res.data && res.data.session) location.replace("admin.html");
+  });
+
+  function setMode(next) {
+    mode = next;
+    var signup = mode === "signup";
+    confirmF.hidden = !signup;
+    submitBtn.textContent = signup ? "Create owner login" : "Sign in";
+    modeBtn.textContent = signup
+      ? "Already set up? Sign in"
+      : "Need an account? Create the owner login";
+    show(errMsg, "");
+    show(okMsg, "");
+  }
+  modeBtn.hidden = false;
+  modeBtn.addEventListener("click", function () {
+    setMode(mode === "signin" ? "signup" : "signin");
+  });
+
+  function validate() {
+    var problems = [];
+    if (!emailEl.value.trim()) problems.push("Enter your email address.");
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value.trim()))
+      problems.push("That does not look like a valid email address.");
+
+    if (!passEl.value) problems.push("Enter your password.");
+    else if (passEl.value.length < 6) problems.push("Passwords are at least 6 characters.");
+
+    if (mode === "signup" && passEl.value !== confirmEl.value)
+      problems.push("The two passwords do not match.");
+
+    return problems;
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    show(errMsg, "");
+
+    var problems = validate();
+    [emailEl, passEl, confirmEl].forEach(function (el) { el.removeAttribute("aria-invalid"); });
+    if (problems.length) {
+      problems.forEach(function (p, i) {
+        if (i === 0) {
+          var target = /email/i.test(p) ? emailEl : /match/i.test(p) ? confirmEl : passEl;
+          target.setAttribute("aria-invalid", "true");
+          target.focus();
+        }
+      });
+      show(errMsg, problems.join(" "));
+      return;
+    }
+
+    setBusy(true);
+    var email = emailEl.value.trim();
+    var pass = passEl.value;
+
+    if (mode === "signup") {
+      client.auth.signUp({ email: email, password: pass })
+        .then(function (res) {
+          if (res.error) throw res.error;
+          if (res.data.session) {
+            location.replace("admin.html");
+            return;
+          }
+          setBusy(false, "Create owner login");
+          show(okMsg,
+            "Account created. If your project requires email confirmation, open the " +
+            "confirmation link first, then sign in.");
+        })
+        .catch(function (err) { fail(err, "Could not create the account."); });
+    } else {
+      client.auth.signInWithPassword({ email: email, password: pass })
+        .then(function (res) {
+          if (res.error) throw res.error;
+          setBusy(false, "Sign in");
+          location.replace("admin.html");
+        })
+        .catch(function (err) { fail(err, "Could not sign you in."); });
+    }
+  });
+
+  function fail(err, prefix) {
+    setBusy(false, mode === "signup" ? "Create owner login" : "Sign in");
+    var message = err && err.message ? err.message : String(err);
+    if (/invalid login credentials/i.test(message))
+      message = "That email and password combination was not recognised.";
+    else if (/already registered|already been registered/i.test(message))
+      message = "That email already has an account. Use “Sign in” instead.";
+    else if (/email not confirmed/i.test(message))
+      message = "Confirm your email address first, then sign in.";
+    else if (/rate limit|too many/i.test(message))
+      message = "Too many attempts. Wait a minute and try again.";
+    show(errMsg, prefix + " " + message);
+  }
+})();
+</script>
+</body>
+</html>

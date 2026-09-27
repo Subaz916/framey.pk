@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FRAMEY.PK — Turn Empty Walls Into Beautiful Stories</title>
+<meta name="description" content="FRAMEY.PK sells premium, hand-finished wall frames across Pakistan. Modern, wooden, luxury, family and art frames with nationwide delivery and Cash on Delivery." />
+<meta name="theme-color" content="#14110f" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ================= NAVBAR ================= -->
+<header class="nav" id="nav">
+  <div class="nav__inner container">
+    <a href="#home" class="brand" aria-label="FRAMEY.PK home">
+      <span class="brand__mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <path d="M3 15.5 8 10l4.5 4.5L16 11l5 4.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </span>
+      <span class="brand__text">FRAMEY<em>.PK</em></span>
+    </a>
+
+    <nav class="nav__links" id="navLinks" aria-label="Primary">
+      <a href="#home" class="nav__link is-active">Home</a>
+      <a href="#shop" class="nav__link">Shop</a>
+      <a href="#categories" class="nav__link">Categories</a>
+      <a href="#about" class="nav__link">About</a>
+    </nav>
+
+    <div class="nav__actions">
+      <button class="icon-btn" id="searchToggle" type="button" aria-label="Search frames" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+          <circle cx="11" cy="11" r="7" /><path d="m20 20-3.2-3.2" />
+        </svg>
+      </button>
+
+      <button class="icon-btn" id="cartToggle" type="button" aria-label="Open cart" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 7h12l-1.1 11.2a2 2 0 0 1-2 1.8H9.1a2 2 0 0 1-2-1.8Z" />
+          <path d="M9 7a3 3 0 0 1 6 0" />
+        </svg>
+        <span class="badge" id="cartCount" hidden>0</span>
+      </button>
+
+      <button class="icon-btn burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Search bar (collapsible) -->
+  <div class="navsearch" id="navSearch" hidden>
+    <div class="container navsearch__inner">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7" /><path d="m20 20-3.2-3.2" />
+      </svg>
+      <input type="search" id="navSearchInput" placeholder="Search frames — try &quot;wooden&quot; or &quot;luxury&quot;" aria-label="Search products" />
+      <span class="navsearch__count" id="navSearchCount"></span>
+      <button class="navsearch__close" id="navSearchClose" type="button" aria-label="Close search">&times;</button>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- ================= HERO ================= -->
+<section class="hero" id="home">
+  <div class="hero__media">
+    <img src="https://images.unsplash.com/photo-1650138278103-1f8a3d208cb3?auto=format&fit=crop&w=1920&q=70"
+         alt="A living room with a colourful gallery wall of framed pictures above a blue sofa" fetchpriority="high" />
+  </div>
+  <div class="hero__scrim"></div>
+  <div class="hero__glow" aria-hidden="true"></div>
+  <div class="hero__grain" aria-hidden="true"></div>
+
+  <div class="hero__marks" aria-hidden="true">
+    <span></span><span></span><span></span><span></span>
+  </div>
+
+  <div class="container hero__inner">
+    <p class="hero__eyebrow reveal" data-delay="0">
+      <span class="rule"></span>
+      <span>Hand-finished frames, delivered nationwide</span>
+      <span class="rule"></span>
+    </p>
+
+    <h1 class="hero__title reveal" data-delay="1">
+      Turn Empty Walls Into <em>Beautiful Stories.</em>
+    </h1>
+
+    <p class="hero__text reveal" data-delay="2">
+      Premium wall frames designed to make your home, office, and personal spaces feel complete.
+    </p>
+
+    <div class="hero__cta reveal" data-delay="3">
+      <a href="#shop" class="btn btn--gold hero__btn" data-scroll>Shop Frames</a>
+      <a href="#categories" class="btn btn--ghost hero__btn" data-scroll>Explore Collection</a>
+    </div>
+
+    <ul class="hero__stats reveal" data-delay="4">
+      <li class="hero__stat">
+        <span class="hero__statIcon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 3.2 2.6 5.4 5.9.8-4.3 4.1 1.1 5.9-5.3-2.9-5.3 2.9 1.1-5.9L3.5 9.4l5.9-.8L12 3.2Z" />
+          </svg>
+        </span>
+        <span class="hero__statBody"><strong>4.8/5</strong><span>Customer rating</span></span>
+      </li>
+      <li class="hero__stat">
+        <span class="hero__statIcon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 8.4 12 4l9 4.4v7.2L12 20l-9-4.4V8.4Z" />
+            <path d="m3 8.4 9 4.4 9-4.4M12 12.8V20" />
+          </svg>
+        </span>
+        <span class="hero__statBody"><strong>2,400+</strong><span>Frames delivered</span></span>
+      </li>
+      <li class="hero__stat">
+        <span class="hero__statIcon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2.6" y="6" width="18.8" height="12" rx="2.2" />
+            <circle cx="12" cy="12" r="2.6" />
+          </svg>
+        </span>
+        <span class="hero__statBody"><strong>COD</strong><span>Pay on delivery</span></span>
+      </li>
+    </ul>
+  </div>
+
+  <a class="hero__scroll" href="#featured" data-scroll aria-label="Scroll to featured frames">
+    <span></span>
+  </a>
+</section>
+
+<!-- ================= FEATURED ================= -->
+<section class="section" id="featured">
+  <div class="container">
+    <header class="sec-head reveal">
+      <div>
+        <p class="sec-head__eyebrow">Handpicked for you</p>
+        <h2 class="sec-head__title">Featured Frames</h2>
+      </div>
+      <a href="#shop" class="link-arrow" data-scroll>View all products
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 12h13M12 5l7 7-7 7" />
+        </svg>
+      </a>
+    </header>
+
+    <div class="grid grid--featured" id="featuredGrid"></div>
+  </div>
+</section>
+
+<!-- ================= CATEGORIES ================= -->
+<section class="section section--beige" id="categories">
+  <div class="container">
+    <header class="sec-head sec-head--center reveal">
+      <p class="sec-head__eyebrow">Browse by style</p>
+      <h2 class="sec-head__title">Categories</h2>
+      <p class="sec-head__sub">Five collections, one obsession — frames that make a wall feel finished.</p>
+    </header>
+
+    <div class="cats" id="catGrid"></div>
+  </div>
+</section>
+
+<!-- ================= SHOP ================= -->
+<section class="section" id="shop">
+  <div class="container">
+    <header class="sec-head reveal">
+      <div>
+        <p class="sec-head__eyebrow">Everything in one place</p>
+        <h2 class="sec-head__title">Shop All Frames</h2>
+      </div>
+      <p class="sec-head__sub sec-head__sub--right" id="shopCount" aria-live="polite"></p>
+    </header>
+
+    <!-- Toolbar -->
+    <div class="toolbar reveal" id="toolbar">
+      <div class="toolbar__row">
+        <div class="field field--search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" /><path d="m20 20-3.2-3.2" />
+          </svg>
+          <input type="search" id="shopSearch" placeholder="Search frames..." aria-label="Search frames" />
+        </div>
+
+        <div class="field">
+          <select id="shopCategory" aria-label="Filter by category">
+            <option value="all">All Categories</option>
+          </select>
+        </div>
+
+        <div class="field field--price">
+          <label for="shopPrice">Max Price</label>
+          <input type="range" id="shopPrice" min="0" max="5000" step="100" value="5000" />
+          <output id="shopPriceOut">Rs. 5,000</output>
+        </div>
+
+        <div class="field">
+          <select id="shopSort" aria-label="Sort products">
+            <option value="popular">Sort: Popularity</option>
+            <option value="low">Price: Low to High</option>
+            <option value="high">Price: High to Low</option>
+            <option value="rating">Rating: Highest</option>
+            <option value="name">Name: A to Z</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="chips" id="activeChips" hidden>
+        <span class="chips__label">Active:</span>
+        <div class="chips__list" id="chipList"></div>
+        <button class="btn btn--tiny" id="clearFilters" type="button">Clear all</button>
+      </div>
+    </div>
+
+    <div class="grid grid--shop" id="shopGrid"></div>
+
+    <div class="empty" id="shopEmpty" hidden>
+      <div class="empty__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <path d="m7 15 3.2-3.4L13 14.6l2.4-2.6L19 16" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <h3 id="shopEmptyTitle">No frames match your filters</h3>
+      <p id="shopEmptyText">Try a different category, raise the price limit, or clear your search.</p>
+      <button class="btn btn--dark" id="emptyReset" type="button">Reset Filters</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ABOUT ================= -->
+<section class="section section--ink" id="about">
+  <div class="container about">
+    <figure class="about__media reveal">
+      <img src="https://images.unsplash.com/photo-1562379448-8ed492a653cf?auto=format&fit=crop&w=1000&q=70"
+           alt="A living room wall decorated with a mix of black and white photo frames" loading="lazy" />
+      <figcaption class="about__badge">
+        <strong>Since 2019</strong>
+        <span>Framing homes across Pakistan</span>
+      </figcaption>
+    </figure>
+
+    <div class="about__body reveal" data-delay="1">
+      <p class="sec-head__eyebrow">About us</p>
+      <h2 class="sec-head__title">Made For Your Walls.</h2>
+      <p class="about__text">
+        FRAMEY.PK brings stylish, affordable, and carefully selected wall frames to homes and spaces
+        across Pakistan. From modern artwork to timeless wooden designs, our collection is made to
+        help you create walls worth remembering.
+      </p>
+
+      <ul class="about__points">
+        <li><span>01</span>Curated in Karachi, delivered nationwide</li>
+        <li><span>02</span>Solid frames, acrylic glazing, acid-free backing</li>
+        <li><span>03</span>Ready to hang — hanging hardware included</li>
+      </ul>
+
+      <a href="#shop" class="btn btn--gold" data-scroll>Browse the Collection</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WHY FRAMEY.PK ================= -->
+<section class="section section--beige" id="why">
+  <div class="container">
+    <header class="sec-head sec-head--center reveal">
+      <p class="sec-head__eyebrow">Why buy from us</p>
+      <h2 class="sec-head__title">Why FRAMEY.PK</h2>
+    </header>
+
+    <div class="feats">
+      <article class="feat reveal">
+        <span class="feat__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3 4 7v10l8 4 8-4V7Z" /><path d="m4 7 8 4 8-4M12 21V11" />
+          </svg>
+        </span>
+        <h3>Premium Quality</h3>
+        <p>Carefully selected materials and finishing.</p>
+      </article>
+
+      <article class="feat reveal" data-delay="1">
+        <span class="feat__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z" /><circle cx="7" cy="18" r="1.8" /><circle cx="17.5" cy="18" r="1.8" />
+          </svg>
+        </span>
+        <h3>Nationwide Delivery</h3>
+        <p>Deliver frames across Pakistan.</p>
+      </article>
+
+      <article class="feat reveal" data-delay="2">
+        <span class="feat__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 8.5 12 4l9 4.5v7L12 20l-9-4.5Z" /><path d="M3 8.5 12 13l9-4.5M12 13v7" />
+          </svg>
+        </span>
+        <h3>Secure Packaging</h3>
+        <p>Frames packed carefully for safer delivery.</p>
+      </article>
+
+      <article class="feat reveal" data-delay="3">
+        <span class="feat__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 6h14l-1.2 10.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8Z" /><path d="M9 6a3 3 0 0 1 6 0" />
+          </svg>
+        </span>
+        <h3>Easy Ordering</h3>
+        <p>Simple online ordering with Cash on Delivery.</p>
+      </article>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+  <div class="container footer__inner">
+    <div class="footer__brand">
+      <a href="#home" class="brand brand--footer">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <path d="M3 15.5 8 10l4.5 4.5L16 11l5 4.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <span class="brand__text">FRAMEY<em>.PK</em></span>
+      </a>
+      <p class="footer__tag">Frame Your Space.</p>
+      <p class="footer__blurb">
+        Premium wall frames, carefully selected and delivered across Pakistan.
+      </p>
+      <ul class="socials" aria-label="Social links">
+        <li>
+          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.29-.04-1.27-.12-2.41-.12-2.39 0-4.03 1.46-4.03 4.14V9.9H7.5V13h2.76v8Z" />
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a href="https://wa.me/923001234567" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12.04 2a9.9 9.9 0 0 0-8.5 14.95L2 22l5.2-1.5A9.9 9.9 0 1 0 12.04 2Zm0 1.8a8.1 8.1 0 1 1-4.2 15l-.3-.18-3.08.89.88-3-.2-.31A8.1 8.1 0 0 1 12.04 3.8Zm-3.3 4.3c-.15 0-.4.06-.6.29-.21.22-.8.78-.8 1.9 0 1.12.82 2.2.93 2.35.11.15 1.6 2.56 4 3.48 2 .77 2.4.62 2.83.58.44-.04 1.4-.57 1.6-1.12.2-.55.2-1.02.14-1.12-.06-.1-.2-.15-.42-.26-.21-.11-1.26-.62-1.45-.7-.2-.07-.34-.1-.48.11-.15.22-.55.7-.67.84-.13.15-.25.17-.46.06-.22-.11-.91-.34-1.73-1.07-.64-.57-1.07-1.27-1.19-1.49-.13-.22-.02-.34.09-.45.1-.1.21-.24.31-.37.11-.12.14-.21.21-.35.07-.13.04-.25-.02-.35-.06-.11-.48-1.19-.67-1.62-.17-.42-.35-.37-.48-.38l-.42-.01Z" />
+            </svg>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <nav class="footer__col" aria-label="Footer">
+      <h4>Explore</h4>
+      <ul>
+        <li><a href="#home" data-scroll>Home</a></li>
+        <li><a href="#shop" data-scroll>Shop</a></li>
+        <li><a href="#categories" data-scroll>Categories</a></li>
+        <li><a href="#about" data-scroll>About</a></li>
+        <li><a href="#contact" data-scroll>Contact</a></li>
+      </ul>
+    </nav>
+
+    <div class="footer__col">
+      <h4>Customer Info</h4>
+      <ul>
+        <li>Cash on Delivery</li>
+        <li>Nationwide Delivery</li>
+        <li>Returns</li>
+      </ul>
+    </div>
+
+    <div class="footer__col" id="contact">
+      <h4>Get In Touch</h4>
+      <ul class="footer__contact">
+        <li><a href="tel:+923001234567">+92 300 1234567</a></li>
+        <li><a href="mailto:hello@framey.pk">hello@framey.pk</a></li>
+        <li>Shop 12, Zamzama Boulevard<br />Clifton Block 5, Karachi</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container footer__bottom">
+    <p>&copy; 2026 FRAMEY.PK. All Rights Reserved.</p>
+    <p class="footer__pay">Cash on Delivery &middot; Nationwide</p>
+  </div>
+</footer>
+
+<!-- ================= PRODUCT MODAL ================= -->
+<div class="overlay" id="productOverlay" hidden>
+  <div class="modal" id="productModal" role="dialog" aria-modal="true" aria-labelledby="pmName">
+    <button class="modal__close" data-close type="button" aria-label="Close product details">&times;</button>
+    <div class="modal__body" id="productModalBody"></div>
+  </div>
+</div>
+
+<!-- ================= CART DRAWER ================= -->
+<div class="scrim" id="cartScrim" hidden></div>
+<aside class="drawer" id="cartDrawer" aria-label="Shopping cart" aria-hidden="true">
+  <header class="drawer__head">
+    <h3>Your Cart <span id="drawerCount" class="drawer__count"></span></h3>
+    <button class="drawer__close" id="cartClose" type="button" aria-label="Close cart">&times;</button>
+  </header>
+
+  <div class="drawer__body" id="cartItems"></div>
+
+  <footer class="drawer__foot" id="cartFoot">
+    <div class="sumline"><span>Subtotal</span><strong id="sumSubtotal">Rs. 0</strong></div>
+    <div class="sumline"><span>Delivery</span><strong id="sumDelivery">Rs. 250</strong></div>
+    <div class="sumline sumline--total"><span>Total</span><strong id="sumTotal">Rs. 0</strong></div>
+    <p class="drawer__note">Pay in cash when your frames arrive. Nationwide delivery across Pakistan.</p>
+    <button class="btn btn--gold btn--block" id="toCheckout" type="button">Proceed to Checkout</button>
+    <button class="btn btn--ghost btn--block" id="keepShopping" type="button">Continue Shopping</button>
+  </footer>
+</aside>
+
+<!-- ================= CHECKOUT MODAL ================= -->
+<div class="overlay overlay--top" id="checkoutOverlay" hidden>
+  <div class="modal modal--checkout" id="checkoutModal" role="dialog" aria-modal="true" aria-labelledby="coTitle">
+    <button class="modal__close" data-close type="button" aria-label="Close checkout">&times;</button>
+
+    <div class="checkout">
+      <div class="checkout__main">
+        <h2 class="checkout__title" id="coTitle">Checkout</h2>
+        <p class="checkout__sub">Fill in your details — we confirm by phone before dispatch.</p>
+
+        <form id="checkoutForm" novalidate>
+          <div class="form-grid">
+            <div class="form-row">
+              <label for="coName">Full Name</label>
+              <input type="text" id="coName" name="name" placeholder="Ahmed Khan" autocomplete="name" />
+              <small class="err" data-for="coName"></small>
+            </div>
+
+            <div class="form-row">
+              <label for="coPhone">Phone Number</label>
+              <input type="tel" id="coPhone" name="phone" placeholder="03XX XXXXXXX" inputmode="numeric" autocomplete="tel" />
+              <small class="err" data-for="coPhone"></small>
+            </div>
+
+            <div class="form-row form-row--full">
+              <label for="coEmail">Email</label>
+              <input type="email" id="coEmail" name="email" placeholder="you@example.com" autocomplete="email" />
+              <small class="err" data-for="coEmail"></small>
+            </div>
+
+            <div class="form-row form-row--full">
+              <label for="coAddress">Complete Address</label>
+              <textarea id="coAddress" name="address" rows="3" placeholder="House / flat no, street, area" autocomplete="street-address"></textarea>
+              <small class="err" data-for="coAddress"></small>
+            </div>
+
+            <div class="form-row">
+              <label for="coCity">City</label>
+              <input type="text" id="coCity" name="city" placeholder="Karachi" autocomplete="address-level2" />
+              <small class="err" data-for="coCity"></small>
+            </div>
+
+            <div class="form-row">
+              <label for="coProvince">Province</label>
+              <select id="coProvince" name="province">
+                <option value="">Select province</option>
+                <option>Punjab</option>
+                <option>Sindh</option>
+                <option>Khyber Pakhtunkhwa</option>
+                <option>Balochistan</option>
+                <option>Gilgit-Baltistan</option>
+                <option>Azad Jammu &amp; Kashmir</option>
+                <option>Islamabad Capital Territory</option>
+              </select>
+              <small class="err" data-for="coProvince"></small>
+            </div>
+
+            <div class="form-row">
+              <label for="coPostal">Postal Code</label>
+              <input type="text" id="coPostal" name="postal" placeholder="75500" inputmode="numeric" autocomplete="postal-code" />
+              <small class="err" data-for="coPostal"></small>
+            </div>
+
+            <div class="form-row form-row--full">
+              <label for="coNotes">Order Notes <span class="opt">(optional)</span></label>
+              <textarea id="coNotes" name="notes" rows="2" placeholder="Delivery timing, landmark, gift message..."></textarea>
+            </div>
+          </div>
+
+          <fieldset class="pay">
+            <legend>Payment Method</legend>
+            <label class="pay__opt is-selected">
+              <input type="radio" name="payment" value="cod" checked />
+              <span class="pay__box" aria-hidden="true"></span>
+              <span class="pay__text">
+                <strong>Cash on Delivery</strong>
+                <small>Pay the courier in cash when your frames reach you.</small>
+              </span>
+            </label>
+          </fieldset>
+
+          <button class="btn btn--gold btn--block" type="submit" id="placeOrder">Place Order</button>
+          <p class="pay__legal">By placing this order you confirm your delivery address and agree to pay on delivery.</p>
+        </form>
+      </div>
+
+      <aside class="checkout__summary">
+        <h4>Order Summary</h4>
+        <div class="summary-items" id="summaryItems"></div>
+        <div class="sumline"><span>Subtotal</span><strong id="sumSubtotal2">Rs. 0</strong></div>
+        <div class="sumline"><span>Delivery</span><strong id="sumDelivery2">Rs. 250</strong></div>
+        <div class="sumline sumline--total"><span>Total</span><strong id="sumTotal2">Rs. 0</strong></div>
+        <ul class="trust">
+          <li>Cash on Delivery</li>
+          <li>Nationwide Delivery</li>
+          <li>Secure Packaging</li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<!-- ================= SUCCESS MODAL ================= -->
+<div class="overlay overlay--top" id="successOverlay" hidden>
+  <div class="modal modal--success" role="dialog" aria-modal="true" aria-labelledby="okTitle">
+    <div class="success">
+      <span class="success__tick" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m5 12.5 4.5 4.5L19 7.5" />
+        </svg>
+      </span>
+      <h2 id="okTitle">Order Placed Successfully!</h2>
+      <p class="success__msg">
+        Shukriya! We have received your order and our team will call you shortly to confirm delivery details.
+      </p>
+      <div class="success__box">
+        <span>Order Number</span>
+        <strong id="orderNumber">—</strong>
+      </div>
+      <p class="success__amount">Total payable on delivery: <strong id="orderTotal">Rs. 0</strong></p>
+      <button class="btn btn--dark btn--block" data-close type="button">Continue Shopping</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= TOAST ================= -->
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="supabase-client.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

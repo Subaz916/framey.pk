@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin panel — FRAMEY.PK</title>
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#14110f" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+<div class="panel" id="panel" hidden>
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="side">
+    <a class="side__brand" href="index.html">
+      <span class="side__mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <path d="M3 15.5 8 10l4.5 4.5L16 11l5 4.5" />
+        </svg>
+      </span>
+      <span>
+        <span class="side__name">FRAMEY<em>.PK</em></span>
+        <span class="side__role">Admin panel</span>
+      </span>
+    </a>
+
+    <nav class="side__nav" aria-label="Admin sections">
+      <button class="side__link is-active" data-view="dashboard" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13h6V4H4v9Zm0 7h6v-4H4v4Zm10 0h6v-9h-6v9Zm0-16v4h6V4h-6Z"/></svg>
+        <span>Dashboard</span>
+      </button>
+      <button class="side__link" data-view="orders" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13H5z"/><path d="M9 9h6M9 13h6M9 17h3"/></svg>
+        <span>Orders</span>
+        <span class="pill" id="navNewOrders" hidden>0</span>
+      </button>
+      <button class="side__link" data-view="products" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m3 15 5-5 4 4 3-3 6 6"/></svg>
+        <span>Products</span>
+      </button>
+      <button class="side__link" data-view="categories" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h7l2 2h9v10H3z"/><path d="M3 7V5h7l2 2"/></svg>
+        <span>Categories</span>
+      </button>
+    </nav>
+
+    <div class="side__foot">
+      <div class="side__who">
+        <strong id="whoName">Admin</strong>
+        <span id="whoEmail">—</span>
+      </div>
+      <button class="side__link" id="signOutBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5H5v14h10M12 12h9m-3-3 3 3-3 3"/></svg>
+        <span>Sign out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ================= MAIN ================= -->
+  <div class="main">
+    <!-- Shown INSTEAD of the whole panel when the signed-in account is not on
+         the admin list. Without this the panel simply looks empty, and every
+         delete/update silently matches zero rows because of RLS. -->
+    <div class="adminGate" id="notAdminGate" hidden>
+      <div class="adminGate__card">
+        <h2>This account is not an admin</h2>
+        <p>
+          You are signed in as <strong id="gateEmail">—</strong>, but that email
+          is not on the admin list. Every read and write is therefore filtered
+          out by the database, which is why orders look missing and deleting a
+          product appears to work but changes nothing.
+        </p>
+        <p>Fix it in the Supabase SQL editor, then reload this page:</p>
+        <pre class="adminGate__sql">insert into public.admins (user_id, email, name)
+select u.id, u.email, u.raw_user_meta_data -&gt;&gt; 'full_name'
+from auth.users u
+where lower(u.email) = lower('subhandaraz90@gmail.com')
+on conflict (user_id) do nothing;</pre>
+        <div class="adminGate__foot">
+          <a class="btn btn--dark" href="admin-access.html">Sign in as someone else</a>
+          <button class="btn" id="gateRecheckBtn" type="button">I have run the SQL — re-check</button>
+        </div>
+      </div>
+    </div>
+
+    <header class="topbar">
+      <div>
+        <h1 id="viewTitle">Dashboard</h1>
+        <p class="topbar__sub" id="viewSub">Loading…</p>
+      </div>
+      <div class="topbar__actions" id="viewActions"></div>
+    </header>
+
+    <!-- ---------- DASHBOARD ---------- -->
+    <section class="view is-active" id="view-dashboard" aria-labelledby="viewTitle">
+      <p class="note note--err" id="dashError" hidden></p>
+      <p class="note note--warn" id="dashNotAdmin" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 8v5m0 3.5v.01M10.3 3.9 2.6 17.4A2 2 0 0 0 4.3 20.4h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+        <span>You are signed in, but this account is not on the admin list, so the data
+        below will stay empty. Add your email to the <code>admin_invites</code> table in
+        Supabase (last line of <code>supabase.sql</code>) and sign in again.</span>
+      </p>
+
+      <div class="stats" id="statCards"></div>
+
+      <div class="dash">
+        <div class="card">
+          <div class="card__head">
+            <div>
+              <h2>Latest orders</h2>
+              <p>The ten most recent orders across every status.</p>
+            </div>
+            <button class="btn btn--ghost btn--sm spacer" data-goto="orders" type="button">View all</button>
+          </div>
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Order</th><th>Customer</th><th>City</th>
+                  <th class="num">Total</th><th>Status</th><th>Placed</th>
+                </tr>
+              </thead>
+              <tbody id="recentOrders"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__head">
+            <div>
+              <h2>Best sellers</h2>
+              <p>Ranked by units actually ordered.</p>
+            </div>
+          </div>
+          <div class="tableWrap">
+            <table>
+              <thead><tr><th>Product</th><th class="num">Units</th><th class="num">Price</th></tr></thead>
+              <tbody id="topProducts"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- ORDERS ---------- -->
+    <section class="view" id="view-orders" aria-labelledby="viewTitle">
+      <p class="note note--err" id="ordersError" hidden></p>
+
+      <div class="toolbar">
+        <input class="input grow" id="orderSearch" type="search"
+               placeholder="Search order no, name, phone or city…" aria-label="Search orders" />
+        <select class="select" id="orderStatus" style="max-width:190px" aria-label="Filter by status">
+          <option value="">All statuses</option>
+          <option value="new">New</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="shipped">Shipped</option>
+          <option value="delivered">Delivered</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+        <select class="select" id="orderRange" style="max-width:170px" aria-label="Date range">
+          <option value="0">All time</option>
+          <option value="7">Last 7 days</option>
+          <option value="30">Last 30 days</option>
+          <option value="90">Last 90 days</option>
+        </select>
+        <button class="btn btn--ghost" id="exportCsv" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v10m0 0 3.5-3.5M12 14l-3.5-3.5M5 18h14"/></svg>
+          Export CSV
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Order</th><th>Customer</th><th>Phone</th><th>City</th>
+                <th class="num">Items</th><th class="num">Total</th><th>Status</th><th>Placed</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="ordersBody"></tbody>
+          </table>
+        </div>
+        <div class="empty" id="ordersEmpty" hidden>
+          <strong>No orders yet</strong>
+          Orders placed on the storefront appear here the moment they are submitted.
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- PRODUCTS ---------- -->
+    <section class="view" id="view-products" aria-labelledby="viewTitle">
+      <p class="note note--warn" id="productNote" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 8v5m0 3.5v.01M10.3 3.9 2.6 17.4A2 2 0 0 0 4.3 20.4h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+        <span>Changes made here appear on the storefront the next time a visitor loads the
+        page. Hide a product with <em>Active</em> rather than deleting it, so existing
+        orders still show the right name and price.</span>
+      </p>
+      <p class="note note--err" id="productsError" hidden></p>
+
+      <div class="toolbar">
+        <input class="input grow" id="productSearch" type="search"
+               placeholder="Search products…" aria-label="Search products" />
+        <select class="select" id="productCategory" style="max-width:180px" aria-label="Filter by category">
+          <option value="">All categories</option>
+        </select>
+        <select class="select" id="productFlag" style="max-width:160px" aria-label="Filter by state">
+          <option value="">All products</option>
+          <option value="active">Active only</option>
+          <option value="inactive">Hidden only</option>
+          <option value="featured">Featured only</option>
+        </select>
+      </div>
+
+      <div class="card">
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th><th>Category</th><th class="num">Price</th>
+                <th class="num">Sold</th><th>Flags</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="productsBody"></tbody>
+          </table>
+        </div>
+        <div class="empty" id="productsEmpty" hidden>
+          <strong>No products match</strong>
+          Try a different search, or add a new product.
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- CATEGORIES ---------- -->
+    <section class="view" id="view-categories" aria-labelledby="viewTitle">
+      <p class="note note--warn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 8v5m0 3.5v.01M10.3 3.9 2.6 17.4A2 2 0 0 0 4.3 20.4h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+        <span>Every product must sit in a category, and the storefront category tiles are
+        built from this list. Renaming the <em>URL id</em> re-links the products in it
+        automatically. Deleting a category moves its products somewhere else — it never
+        deletes a product.</span>
+      </p>
+      <p class="note note--err" id="categoriesError" hidden></p>
+
+      <div class="toolbar">
+        <input class="input grow" id="categorySearch" type="search"
+               placeholder="Search categories…" aria-label="Search categories" />
+        <button class="btn btn--gold" id="addCategoryBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Add category
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th><th>URL id</th><th class="num">Products</th>
+                <th>Tile image</th><th class="num">Order</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="categoriesBody"></tbody>
+          </table>
+        </div>
+        <div class="empty" id="categoriesEmpty" hidden>
+          <strong>No categories yet</strong>
+          Add one before you add a product — every product needs a category.
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ================= ORDER DETAIL MODAL ================= -->
+<div class="modal" id="orderModal" hidden>
+  <div class="modal__box modal__box--wide" role="dialog" aria-modal="true" aria-labelledby="orderModalTitle">
+    <form id="orderForm" novalidate>
+      <div class="modal__head">
+        <h2 id="orderModalTitle">Order</h2>
+        <button class="modal__close spacer" data-close type="button" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+
+      <div class="modal__body" id="orderModalBody"></div>
+
+      <div class="modal__foot">
+        <a class="btn btn--ghost spacer" id="orderWhatsApp" target="_blank" rel="noopener">Message on WhatsApp</a>
+        <button class="btn btn--quiet" data-close type="button">Close</button>
+        <button class="btn btn--primary" id="orderSave" type="submit">Save changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ================= PRODUCT EDIT MODAL ================= -->
+<div class="modal" id="productModal" hidden>
+  <div class="modal__box" role="dialog" aria-modal="true" aria-labelledby="productModalTitle">
+    <form id="productForm" novalidate>
+      <div class="modal__head">
+        <h2 id="productModalTitle">Add product</h2>
+        <button class="modal__close spacer" data-close type="button" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+
+      <div class="modal__body">
+        <p class="note note--err" id="productFormError" hidden></p>
+
+        <div class="form">
+          <div class="full">
+            <label for="pName">Name <span class="req">*</span></label>
+            <input class="input" id="pName" required />
+            <p class="err">Give the product a name.</p>
+          </div>
+
+          <div class="full">
+            <label for="pSlug">URL id <span class="req">*</span></label>
+            <input class="input" id="pSlug" required placeholder="walnut-wide-frame" />
+            <p class="err">Lowercase letters, numbers and dashes only.</p>
+          </div>
+
+          <div>
+            <label for="pCategory">Category <span class="req">*</span></label>
+            <select class="select" id="pCategory" required></select>
+            <p class="err">Pick a category.</p>
+          </div>
+
+          <div>
+            <label for="pPrice">Price (PKR) <span class="req">*</span></label>
+            <input class="input" id="pPrice" type="number" min="0" step="1" required />
+            <p class="err">Enter a price of 0 or more.</p>
+          </div>
+
+          <div>
+            <label for="pOldPrice">Was price (PKR)</label>
+            <input class="input" id="pOldPrice" type="number" min="0" step="1" />
+            <p class="err">Must be higher than the price, or leave empty.</p>
+          </div>
+
+          <div>
+            <label for="pColour">Colour</label>
+            <input class="input" id="pColour" placeholder="Walnut Brown" />
+          </div>
+
+          <div class="full">
+            <label for="pMaterial">Material</label>
+            <input class="input" id="pMaterial" placeholder="Solid Sheesham Wood" />
+          </div>
+
+          <div>
+            <label for="pColourHex">Colour swatch</label>
+            <input class="input" id="pColourHex" type="color" style="height:42px;padding:4px" />
+          </div>
+
+          <div>
+            <label for="pSizes">Sizes <span class="req">*</span></label>
+            <input class="input" id="pSizes" required placeholder="8 × 10 inch, 12 × 16 inch" />
+            <p class="err">Separate the sizes with commas.</p>
+          </div>
+
+          <div class="full">
+            <label for="pImage">Image URL <span class="req">*</span></label>
+            <input class="input" id="pImage" required placeholder="https://images.unsplash.com/…" />
+            <p class="err">An https image URL is required.</p>
+          </div>
+
+          <div class="full">
+            <label for="pDescription">Description</label>
+            <textarea class="textarea" id="pDescription"></textarea>
+          </div>
+
+          <div>
+            <label class="checkline"><input type="checkbox" id="pFeatured" /> Show in Featured</label>
+          </div>
+          <div>
+            <label class="checkline"><input type="checkbox" id="pActive" checked /> Visible on the storefront</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal__foot">
+        <button class="btn btn--quiet" data-close type="button">Cancel</button>
+        <button class="btn btn--primary" id="productSave" type="submit">Save product</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ================= CATEGORY EDIT MODAL ================= -->
+<div class="modal" id="categoryModal" hidden>
+  <div class="modal__box" role="dialog" aria-modal="true" aria-labelledby="categoryModalTitle">
+    <form id="categoryForm" novalidate>
+      <div class="modal__head">
+        <h2 id="categoryModalTitle">Add category</h2>
+        <button class="modal__close spacer" data-close type="button" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+
+      <div class="modal__body">
+        <p class="note note--err" id="categoryFormError" hidden></p>
+
+        <div class="form">
+          <div class="full">
+            <label for="cName">Name <span class="req">*</span></label>
+            <input class="input" id="cName" required placeholder="Vintage" />
+            <p class="err">Give the category a name.</p>
+          </div>
+
+          <div class="full">
+            <label for="cSlug">URL id <span class="req">*</span></label>
+            <input class="input" id="cSlug" required placeholder="vintage" />
+            <p class="err">Lowercase letters, numbers and dashes only.</p>
+          </div>
+
+          <div class="full">
+            <label for="cImage">Tile image URL</label>
+            <input class="input" id="cImage" placeholder="https://images.unsplash.com/…" />
+            <p class="err">Use a full https:// image URL, or leave it empty.</p>
+          </div>
+
+          <div>
+            <label for="cSort">Display order</label>
+            <input class="input" id="cSort" type="number" step="1" />
+            <p class="err">Lower numbers appear first.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal__foot">
+        <button class="btn btn--quiet" data-close type="button">Cancel</button>
+        <button class="btn btn--primary" id="categorySave" type="submit">Save category</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="supabase-client.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
