@@ -14,6 +14,8 @@
 </head>
 <body class="tpage">
 
+<div class="tbg" aria-hidden="true"></div>
+
 <header class="tbar">
   <div class="tbar__inner">
     <a href="index.html" class="brand" aria-label="FRAMEY.PK home">
@@ -30,74 +32,116 @@
 </header>
 
 <main class="tmain">
-  <div class="container">
+  <div class="tshell">
 
+    <!-- ================= HERO ================= -->
     <div class="thead">
+      <span class="thead__bracket" aria-hidden="true"></span>
       <p class="thead__eyebrow">Order Tracking</p>
       <h1 class="thead__title">Where is my <em>frame</em>?</h1>
       <p class="thead__sub">
         Enter your order number and the phone number you gave at checkout.
-        Both are needed — your order number alone is not enough to look an order up.
+        Both are needed &mdash; your order number on its own is not enough to look an order up.
       </p>
     </div>
 
     <!-- ================= LOOKUP FORM ================= -->
     <form class="tcard tcard--form" id="trackForm" novalidate>
+      <span class="tcard__rule" aria-hidden="true"></span>
+
       <div class="tfield">
         <label for="orderNo">Order number</label>
-        <input id="orderNo" name="orderNo" type="text" inputmode="text"
-               autocomplete="off" spellcheck="false" placeholder="FR-260101-1234" required />
+        <div class="tfield__wrap">
+          <svg class="tfield__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 7V5.5A1.5 1.5 0 0 1 5.5 4H7" /><path d="M17 4h1.5A1.5 1.5 0 0 1 20 5.5V7" />
+            <path d="M20 17v1.5a1.5 1.5 0 0 1-1.5 1.5H17" /><path d="M7 20H5.5A1.5 1.5 0 0 1 4 18.5V17" />
+            <path d="M8 12h8" />
+          </svg>
+          <input id="orderNo" name="orderNo" type="text" autocomplete="off" spellcheck="false"
+                 placeholder="FR-260101-1234" required />
+        </div>
         <small class="tfield__hint">It looks like FR-YYMMDD-XXXX, and is on your confirmation screen.</small>
       </div>
 
       <div class="tfield">
         <label for="phone">Phone number</label>
-        <input id="phone" name="phone" type="tel" inputmode="tel"
-               autocomplete="tel" placeholder="0300 1234567" required />
+        <div class="tfield__wrap">
+          <svg class="tfield__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="6" y="2.5" width="12" height="19" rx="2.6" />
+            <path d="M10.5 18.6h3" />
+          </svg>
+          <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel"
+                 placeholder="0300 1234567" required />
+        </div>
         <small class="tfield__hint">The number you gave at checkout. Dashes and spaces are fine.</small>
       </div>
 
       <p class="tnote tnote--err" id="formError" role="alert" hidden></p>
 
-      <button class="btn btn--gold btn--block" id="trackBtn" type="submit">Track my order</button>
+      <button class="btn btn--gold btn--block tbtn" id="trackBtn" type="submit">
+        <span class="tbtn__spin" aria-hidden="true"></span>
+        <span class="tbtn__label">Track my order</span>
+      </button>
+
+      <p class="tcard__fine">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="4.5" y="10.5" width="15" height="10" rx="2.2" />
+          <path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7" />
+        </svg>
+        Used only to find your order. Nothing is stored.
+      </p>
     </form>
+
+    <ul class="ttrust" aria-label="Our service">
+      <li>Cash on Delivery</li>
+      <li>Nationwide Delivery</li>
+      <li>Secure Packaging</li>
+    </ul>
 
     <!-- ================= RESULT ================= -->
     <section class="tcard tcard--result" id="result" aria-live="polite" hidden>
+      <span class="tcard__rule" aria-hidden="true"></span>
 
-      <div class="tstatus" id="tstatus"></div>
+      <div class="tresult__head">
+        <div class="tstatus" id="tstatus"></div>
+        <p class="tstatus__no">Order <span class="mono" id="mOrderNo">&mdash;</span></p>
+      </div>
 
-      <!-- Progress stepper: new -> confirmed -> shipped -> delivered -->
-      <ol class="tstep" id="tstep" hidden>
-        <li class="tstep__item" data-step="new"><span class="tstep__dot"></span><span class="tstep__label">Order placed</span></li>
-        <li class="tstep__item" data-step="confirmed"><span class="tstep__dot"></span><span class="tstep__label">Confirmed</span></li>
-        <li class="tstep__item" data-step="shipped"><span class="tstep__dot"></span><span class="tstep__label">Shipped</span></li>
-        <li class="tstep__item" data-step="delivered"><span class="tstep__dot"></span><span class="tstep__label">Delivered</span></li>
-      </ol>
+      <!-- Progress: new -> confirmed -> shipped -> delivered -->
+      <div class="tstepwrap" id="tstep" hidden>
+        <span class="tstep__rail" aria-hidden="true"><span class="tstep__fill"></span></span>
+        <ol class="tstep">
+          <li class="tstep__item" data-step="new"><span class="tstep__dot"></span><span class="tstep__label">Order placed</span></li>
+          <li class="tstep__item" data-step="confirmed"><span class="tstep__dot"></span><span class="tstep__label">Confirmed</span></li>
+          <li class="tstep__item" data-step="shipped"><span class="tstep__dot"></span><span class="tstep__label">Shipped</span></li>
+          <li class="tstep__item" data-step="delivered"><span class="tstep__dot"></span><span class="tstep__label">Delivered</span></li>
+        </ol>
+      </div>
 
       <div class="tgrid">
         <div class="tmeta">
-          <h2 class="tcard__h">Order details</h2>
+          <h2 class="tcard__h">Summary</h2>
           <dl class="tdl">
-            <div><dt>Order number</dt><dd class="mono" id="mOrderNo">&mdash;</dd></div>
             <div><dt>Placed on</dt><dd id="mPlaced">&mdash;</dd></div>
             <div><dt>Payment</dt><dd>Cash on Delivery</dd></div>
             <div><dt>Status</dt><dd id="mStatus">&mdash;</dd></div>
+            <div><dt>Items</dt><dd id="mCount">&mdash;</dd></div>
           </dl>
         </div>
 
         <div class="titems">
           <h2 class="tcard__h">What you ordered</h2>
           <ul class="titems__list" id="itemList"></ul>
-          <div class="tsums">
-            <div class="tsums__row"><span>Subtotal</span><strong id="mSubtotal">Rs. 0</strong></div>
-            <div class="tsums__row"><span>Delivery</span><strong id="mDelivery">Rs. 0</strong></div>
-            <div class="tsums__row tsums__row--total"><span>Total payable on delivery</span><strong id="mTotal">Rs. 0</strong></div>
-          </div>
         </div>
       </div>
 
-      <p class="tnote" id="statusNote"></p>
+      <div class="tsums">
+        <div class="tsums__row"><span>Subtotal</span><strong id="mSubtotal">Rs. 0</strong></div>
+        <div class="tsums__row"><span>Delivery</span><strong id="mDelivery">Rs. 0</strong></div>
+        <div class="tsums__row tsums__row--total"><span>Total payable on delivery</span><strong id="mTotal">Rs. 0</strong></div>
+      </div>
+
+      <p class="tnote tnote--soft" id="statusNote"></p>
 
       <div class="tresult__actions">
         <button class="btn btn--ghost" type="button" id="againBtn">Track another order</button>
@@ -107,6 +151,7 @@
 
     <!-- ================= NOT FOUND ================= -->
     <section class="tcard tcard--empty" id="notFound" hidden>
+      <span class="tcard__rule" aria-hidden="true"></span>
       <span class="tempty__mark" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="7" /><path d="m20 20-3.2-3.2" />
@@ -118,7 +163,7 @@
         the order exactly. If you ordered with a different phone number, or the
         order was only just placed, it may not be showing yet.
       </p>
-      <button class="btn btn--ghost" type="button" id="retryBtn">Try again</button>
+      <button class="btn btn--dark" type="button" id="retryBtn">Try again</button>
     </section>
 
     <p class="thelp">
@@ -158,6 +203,7 @@
   var orderNoEl = $("#orderNo");
   var phoneEl   = $("#phone");
   var btn       = $("#trackBtn");
+  var btnLabel  = $(".tbtn__label", btn);
   var formError = $("#formError");
   var result    = $("#result");
   var notFound  = $("#notFound");
@@ -196,7 +242,8 @@
 
   function setBusy(busy) {
     btn.disabled = busy;
-    btn.textContent = busy ? "Looking up…" : "Track my order";
+    btn.classList.toggle("is-busy", busy);
+    if (btnLabel) btnLabel.textContent = busy ? "Looking up…" : "Track my order";
   }
 
   /* Pre-fill from the confirmation link: /track-order.html?order=FR-260101-1234
@@ -209,6 +256,7 @@
 
   function render(order) {
     var status = String(order.status || "new").toLowerCase();
+    var items = Array.isArray(order.items) ? order.items : [];
 
     // --- headline status pill
     var pill = $("#tstatus");
@@ -225,7 +273,13 @@
       Array.prototype.forEach.call(step.children, function (li, i) {
         li.classList.toggle("is-done", i < idx);
         li.classList.toggle("is-now", i === idx);
+        // Stagger the entrance so the dots land one after another.
+        li.style.animationDelay = 90 + i * 110 + "ms";
       });
+      // The rail runs between the first and last dot centre, so the filled
+      // portion is idx / 3 of the way along it. Published as a fraction so the
+      // vertical layout on narrow screens can drive height from the same value.
+      step.style.setProperty("--p", idx / (STEP_ORDER.length - 1));
     }
 
     // --- facts
@@ -237,18 +291,26 @@
         })
       : "—";
     $("#mStatus").textContent = STATUS_TEXT[status] || status;
+
+    var units = items.reduce(function (n, it) {
+      return n + Math.max(1, parseInt(it && it.qty, 10) || 1);
+    }, 0);
+    $("#mCount").textContent = items.length === 0
+      ? "—"
+      : units + (units === 1 ? " frame" : " frames");
+
     $("#mSubtotal").textContent = rs(order.subtotal);
     $("#mDelivery").textContent = Number(order.delivery) === 0 ? "Free" : rs(order.delivery);
     $("#mTotal").textContent = rs(order.total);
 
     // --- items, built with textContent so a product name can never inject markup
     itemList.textContent = "";
-    var items = Array.isArray(order.items) ? order.items : [];
-    items.forEach(function (it) {
+    items.forEach(function (it, n) {
       var qty = Math.max(1, parseInt(it && it.qty, 10) || 1);
 
       var li = document.createElement("li");
       li.className = "titems__row";
+      li.style.animationDelay = 120 + n * 60 + "ms";
 
       var main = document.createElement("div");
       main.className = "titems__main";

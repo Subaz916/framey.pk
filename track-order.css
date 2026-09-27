@@ -2,6 +2,10 @@
    FRAMEY.PK — track-order.css
    Page-specific styles for /track-order.html. Everything shared (tokens,
    reset, buttons, brand) comes from style.css.
+
+   The whole page is one centred column. Headings, pills and buttons are
+   centred; the data rows inside the result card stay left-aligned, because
+   centred figures are much harder to scan.
    ========================================================================== */
 
 .tpage{
@@ -9,13 +13,34 @@
   display:flex;
   flex-direction:column;
   background:var(--cream);
+  position:relative;
+  isolation:isolate;
+}
+
+/* A soft gold glow behind the hero, so the page has a light source. */
+.tbg{
+  position:fixed;
+  inset:0 0 auto 0;
+  height:min(760px,80svh);
+  z-index:-1;
+  pointer-events:none;
+  background:
+    radial-gradient(58% 52% at 50% 0%, rgba(176,141,87,.20) 0%, rgba(176,141,87,0) 68%),
+    radial-gradient(38% 34% at 82% 12%, rgba(201,164,95,.14) 0%, rgba(201,164,95,0) 70%),
+    linear-gradient(180deg, var(--beige-2) 0%, rgba(240,232,220,0) 100%);
 }
 
 /* ---------- top bar ---------- */
-.tbar{background:var(--ink);color:var(--cream)}
+.tbar{
+  position:sticky;top:0;z-index:20;
+  background:rgba(20,17,15,.86);
+  -webkit-backdrop-filter:blur(14px);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(232,220,200,.10);
+}
 .tbar__inner{
   width:100%;max-width:var(--wrap);margin-inline:auto;
-  padding:18px 24px;
+  padding:16px 24px;
   display:flex;align-items:center;justify-content:space-between;gap:16px;
 }
 .tbar__back{
@@ -24,188 +49,368 @@
 }
 .tbar__back:hover{color:var(--gold-soft)}
 
-/* ---------- page head ---------- */
-.tmain{flex:1;padding:clamp(44px,7vw,86px) 0 clamp(56px,8vw,96px)}
-
-.thead{max-width:60ch;margin-bottom:clamp(30px,4vw,46px)}
-.thead__eyebrow{
-  font-size:.72rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--gold);margin-bottom:14px;
+/* ---------- the centred column ---------- */
+.tmain{
+  flex:1;
+  display:flex;
+  justify-content:center;
+  padding:clamp(46px,7vw,92px) 24px clamp(56px,8vw,104px);
 }
-.thead__title{font-size:clamp(2rem,4.6vw,3.1rem);line-height:1.08}
+.tshell{
+  width:100%;
+  max-width:760px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;      /* every card is centred on the page */
+  text-align:center;      /* ...and so is the type above the fold */
+}
+
+/* ---------- hero ---------- */
+.thead{
+  position:relative;
+  max-width:56ch;
+  margin-bottom:clamp(28px,4vw,44px);
+  padding:clamp(26px,4vw,40px) clamp(20px,4vw,48px);
+}
+/* Corner brackets: a frame motif, which is the whole point of the shop.
+   Eight short gradients paint the corners only, so nothing needs masking. */
+.thead__bracket{
+  position:absolute;
+  inset:9px;
+  pointer-events:none;
+  background:
+    linear-gradient(var(--gold),var(--gold)) 0 0            / 26px 2px no-repeat,
+    linear-gradient(var(--gold),var(--gold)) 0 0            / 2px 26px no-repeat,
+    linear-gradient(var(--gold),var(--gold)) 100% 0         / 26px 2px no-repeat,
+    linear-gradient(var(--gold),var(--gold)) 100% 0         / 2px 26px no-repeat,
+    linear-gradient(var(--gold),var(--gold)) 0 100%         / 26px 2px no-repeat,
+    linear-gradient(var(--gold),var(--gold)) 0 100%         / 2px 26px no-repeat,
+    linear-gradient(var(--gold),var(--gold)) 100% 100%      / 26px 2px no-repeat,
+    linear-gradient(var(--gold),var(--gold)) 100% 100%      / 2px 26px no-repeat;
+  opacity:.42;
+}
+.thead__eyebrow{
+  font-size:.72rem;font-weight:600;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:16px;
+}
+.thead__title{
+  font-size:clamp(2.1rem,5.4vw,3.4rem);
+  line-height:1.06;
+  letter-spacing:-.01em;
+}
 .thead__title em{font-style:italic;color:var(--gold)}
-.thead__sub{color:var(--muted);margin-top:14px;font-size:1.02rem}
+.thead__sub{
+  color:var(--muted);
+  margin:16px auto 0;
+  max-width:48ch;
+  font-size:1.02rem;
+  line-height:1.65;
+}
 
 /* ---------- cards ---------- */
 .tcard{
+  position:relative;
+  width:100%;
   background:var(--white);
   border:1px solid var(--line);
   border-radius:var(--r-lg);
   box-shadow:var(--sh-2);
-  padding:clamp(24px,3.4vw,38px);
+  padding:clamp(26px,3.6vw,42px);
+  text-align:left;
+  overflow:hidden;
+  animation:cardIn .5s var(--ease) both;
 }
-.tcard--form{max-width:620px}
-.tcard--result{margin-top:22px}
-.tcard--empty{
-  margin-top:22px;max-width:620px;text-align:center;
-  display:flex;flex-direction:column;align-items:center;gap:14px;
+/* A hairline of gold along the top edge. */
+.tcard__rule{
+  position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,
+    rgba(176,141,87,0) 0%, var(--gold) 22%, var(--gold-2) 50%, var(--gold) 78%, rgba(176,141,87,0) 100%);
 }
-.tcard__h{font-size:1.22rem;margin-bottom:18px}
+.tcard--result,.tcard--empty{margin-top:22px}
+
+.tcard__h{
+  font-size:.74rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:18px;
+}
 
 /* ---------- form ---------- */
-.tfield{margin-bottom:20px}
+.tfield{margin-bottom:22px}
+.tfield:last-of-type{margin-bottom:24px}
 .tfield label{
-  display:block;font-size:.76rem;font-weight:600;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--brown-2);margin-bottom:8px;
+  display:block;font-size:.74rem;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--brown-2);margin-bottom:9px;
+}
+.tfield__wrap{position:relative;display:flex;align-items:center}
+.tfield__icon{
+  position:absolute;left:16px;width:19px;height:19px;
+  color:var(--gold);opacity:.75;pointer-events:none;
 }
 .tfield input{
-  width:100%;padding:14px 16px;font:inherit;font-size:1rem;
-  color:var(--ink);background:var(--cream);
-  border:1px solid var(--line);border-radius:var(--r-sm);
-  transition:border-color .25s var(--ease),box-shadow .25s var(--ease);
+  width:100%;
+  padding:15px 16px 15px 46px;
+  font:inherit;font-size:1rem;color:var(--ink);
+  background:var(--cream);
+  border:1px solid var(--line);
+  border-radius:var(--r-sm);
+  transition:border-color .25s var(--ease),box-shadow .25s var(--ease),background .25s var(--ease);
 }
-.tfield input::placeholder{color:#b3a89c}
+.tfield input::placeholder{color:#b8ada0}
+.tfield input:hover{border-color:rgba(176,141,87,.4)}
 .tfield input:focus{
-  outline:none;border-color:var(--gold);
-  box-shadow:0 0 0 3px rgba(176,141,87,.18);
+  outline:none;
+  background:var(--white);
+  border-color:var(--gold);
+  box-shadow:0 0 0 4px rgba(176,141,87,.16);
 }
-.tfield input[aria-invalid="true"]{border-color:var(--danger)}
-.tfield__hint{display:block;font-size:.78rem;color:var(--muted);margin-top:7px}
+.tfield input[aria-invalid="true"]{border-color:var(--danger);box-shadow:0 0 0 4px rgba(179,64,47,.13)}
+.tfield__hint{display:block;font-size:.78rem;color:var(--muted);margin-top:8px}
 
+/* ---------- button with spinner ---------- */
+.tbtn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:10px}
+.tbtn__spin{
+  display:none;
+  width:16px;height:16px;flex:none;
+  border:2px solid rgba(255,255,255,.35);
+  border-top-color:var(--white);
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+.tbtn.is-busy .tbtn__spin{display:block}
+.tbtn.is-busy{pointer-events:none;opacity:.92}
+
+.tcard__fine{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-top:16px;font-size:.78rem;color:var(--muted);
+}
+.tcard__fine svg{width:15px;height:15px;flex:none;opacity:.7}
+
+/* ---------- notes ---------- */
 .tnote{
-  font-size:.86rem;line-height:1.55;color:var(--muted);
-  padding:13px 15px;border-radius:var(--r-sm);
+  font-size:.88rem;line-height:1.6;color:var(--brown-2);
+  padding:14px 16px;border-radius:var(--r-sm);
   background:var(--beige-2);border:1px solid var(--line-2);
 }
+.tnote--soft{margin-top:24px;text-align:center}
 .tnote--err{
   color:var(--danger);background:rgba(179,64,47,.07);
-  border-color:rgba(179,64,47,.26);margin:0 0 18px;
+  border-color:rgba(179,64,47,.26);margin:0 0 20px;
+  animation:shake .38s var(--ease);
 }
+
+/* ---------- trust strip ---------- */
+.ttrust{
+  list-style:none;
+  display:flex;flex-wrap:wrap;justify-content:center;gap:10px 26px;
+  margin-top:26px;
+  font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);
+}
+.ttrust li{display:flex;align-items:center;gap:9px}
+.ttrust li::before{
+  content:"";width:5px;height:5px;border-radius:50%;
+  background:var(--gold);flex:none;
+}
+
+/* ---------- result head ---------- */
+.tresult__head{
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  padding-bottom:26px;border-bottom:1px solid var(--line-2);
+}
+.tstatus__no{font-size:.86rem;color:var(--muted)}
+.tstatus__no .mono{color:var(--ink);font-weight:600}
 
 /* ---------- status pill ---------- */
 .tstatus{
-  display:inline-flex;align-items:center;gap:9px;
-  padding:9px 17px;border-radius:999px;
-  font-size:.8rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
+  display:inline-flex;align-items:center;gap:10px;
+  padding:10px 20px;border-radius:999px;
+  font-size:.8rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
   background:var(--beige-2);color:var(--brown);
+  box-shadow:inset 0 0 0 1px rgba(20,17,15,.05);
 }
 .tstatus::before{
   content:"";width:8px;height:8px;border-radius:50%;
   background:currentColor;flex:none;
 }
-.tstatus--new{background:rgba(176,141,87,.15);color:#8a6a35}
+.tstatus--new{background:rgba(176,141,87,.16);color:#8a6a35}
 .tstatus--confirmed{background:rgba(47,107,79,.13);color:var(--ok)}
 .tstatus--shipped{background:rgba(58,46,37,.12);color:var(--brown)}
 .tstatus--delivered{background:rgba(47,107,79,.15);color:var(--ok)}
 .tstatus--cancelled{background:rgba(179,64,47,.12);color:var(--danger)}
+/* The live stage breathes; the finished ones sit still. */
+.tstatus--new::before,
+.tstatus--confirmed::before{animation:pulse 1.9s var(--ease) infinite}
 
 /* ---------- progress stepper ---------- */
+.tstepwrap{position:relative;padding:34px 0 30px}
 .tstep{
-  list-style:none;display:grid;grid-template-columns:repeat(4,1fr);
-  gap:8px;margin:30px 0 6px;position:relative;
+  list-style:none;
+  position:relative;z-index:1;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
+  margin:0;padding:0;
 }
-/* the connecting rail sits behind the dots */
-.tstep::before{
-  content:"";position:absolute;left:12.5%;right:12.5%;top:7px;
-  height:2px;background:var(--line);
+/* the rail sits behind the dots, spanning first dot centre to last dot centre */
+.tstep__rail{
+  position:absolute;left:12.5%;right:12.5%;top:calc(34px + 7px);
+  height:2px;background:var(--line);border-radius:2px;overflow:hidden;
 }
-.tstep__item{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px}
+.tstep__fill{
+  display:block;height:100%;
+  width:calc(var(--p, 0) * 100%);
+  border-radius:2px;
+  background:linear-gradient(90deg,var(--gold-2),var(--gold));
+  transition:width .7s var(--ease),height .7s var(--ease);
+}
+.tstep__item{
+  display:flex;flex-direction:column;align-items:center;gap:11px;
+  animation:dotIn .45s var(--ease) both;
+}
 .tstep__dot{
   width:16px;height:16px;border-radius:50%;
   background:var(--white);border:2px solid var(--line);
-  position:relative;z-index:1;
+  position:relative;z-index:2;
+  transition:background .4s var(--ease),border-color .4s var(--ease),box-shadow .4s var(--ease);
 }
 .tstep__label{
   font-size:.76rem;color:var(--muted);text-align:center;line-height:1.35;
+  transition:color .4s var(--ease);
 }
 .tstep__item.is-done .tstep__dot{background:var(--gold);border-color:var(--gold)}
 .tstep__item.is-done .tstep__label{color:var(--brown)}
 .tstep__item.is-now .tstep__dot{
   background:var(--gold);border-color:var(--gold);
   box-shadow:0 0 0 5px rgba(176,141,87,.2);
+  animation:pulse 1.9s var(--ease) infinite;
 }
 .tstep__item.is-now .tstep__label{color:var(--ink);font-weight:600}
 
 /* ---------- two-column detail grid ---------- */
 .tgrid{
-  display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(24px,3vw,40px);
-  margin-top:34px;padding-top:30px;border-top:1px solid var(--line-2);
+  display:grid;grid-template-columns:1fr 1.25fr;gap:clamp(24px,3.4vw,44px);
+  padding:30px 0 26px;border-bottom:1px solid var(--line-2);
 }
 
 /* ---------- definition list ---------- */
 .tdl{display:grid;gap:16px}
 .tdl > div{display:flex;flex-direction:column;gap:4px}
 .tdl dt{
-  font-size:.72rem;font-weight:600;letter-spacing:.12em;
+  font-size:.7rem;font-weight:600;letter-spacing:.14em;
   text-transform:uppercase;color:var(--muted);
 }
-.tdl dd{font-size:1rem;color:var(--ink)}
-.tdl dd.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.tdl dd{font-size:.98rem;color:var(--ink);margin:0}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.02em}
 
 /* ---------- items ---------- */
-.titems__list{list-style:none;display:grid;gap:14px}
+.titems__list{list-style:none;display:grid;gap:4px}
 .titems__row{
   display:flex;align-items:flex-start;justify-content:space-between;gap:18px;
-  padding-bottom:14px;border-bottom:1px solid var(--line-2);
+  padding:12px 12px;border-radius:10px;
+  transition:background .25s var(--ease);
+  animation:rowIn .45s var(--ease) both;
 }
-.titems__row:last-child{border-bottom:0;padding-bottom:0}
+.titems__row:hover{background:var(--beige-2)}
 .titems__main{display:flex;flex-direction:column;gap:4px;min-width:0}
-.titems__name{font-size:.98rem;color:var(--ink)}
+.titems__name{font-size:.96rem;color:var(--ink);line-height:1.35}
 .titems__meta{font-size:.78rem;color:var(--muted)}
-.titems__price{font-size:.98rem;color:var(--ink);white-space:nowrap}
+.titems__price{font-size:.96rem;color:var(--ink);white-space:nowrap;font-weight:500}
 
-.tsums{margin-top:22px;display:grid;gap:11px}
+/* ---------- totals ---------- */
+.tsums{margin-top:26px;display:grid;gap:12px;max-width:420px;margin-inline:auto}
 .tsums__row{
   display:flex;justify-content:space-between;gap:16px;
-  font-size:.88rem;color:var(--muted);
+  font-size:.9rem;color:var(--muted);
 }
 .tsums__row strong{color:var(--ink);font-weight:500}
 .tsums__row--total{
-  margin-top:6px;padding-top:14px;border-top:1px solid var(--line);
+  margin-top:6px;padding-top:16px;border-top:1px solid var(--line);
   font-size:1rem;color:var(--ink);
 }
-.tsums__row--total strong{font-size:1.16rem;font-weight:600}
+.tsums__row--total strong{font-size:1.28rem;font-weight:600}
 
 /* ---------- empty state ---------- */
+.tcard--empty{text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px}
 .tempty__mark{
-  display:grid;place-items:center;width:56px;height:56px;
+  display:grid;place-items:center;width:62px;height:62px;
   border-radius:50%;background:var(--beige-2);color:var(--muted);
+  box-shadow:inset 0 0 0 1px var(--line-2);
 }
-.tempty__msg{font-size:.94rem;color:var(--muted);max-width:46ch;line-height:1.6}
+.tempty__mark svg{width:26px;height:26px}
+.tempty__msg{font-size:.94rem;color:var(--muted);max-width:46ch;line-height:1.65}
+.tcard--empty .btn{margin-top:6px}
 
+/* ---------- result actions ---------- */
 .tresult__actions{
-  display:flex;flex-wrap:wrap;gap:12px;
-  margin-top:30px;padding-top:26px;border-top:1px solid var(--line-2);
+  display:flex;flex-wrap:wrap;gap:12px;justify-content:center;
+  margin-top:28px;
 }
-.tresult__actions .btn{flex:1 1 auto;min-width:170px}
+.tresult__actions .btn{flex:1 1 auto;min-width:180px;max-width:260px}
 
 /* ---------- help + footer ---------- */
 .thelp{
-  margin-top:30px;font-size:.88rem;color:var(--muted);line-height:1.7;
-  max-width:62ch;
+  margin-top:34px;font-size:.88rem;color:var(--muted);line-height:1.75;
+  max-width:52ch;text-align:center;
 }
-.thelp a{color:var(--brown);text-decoration:underline;text-underline-offset:3px}
+.thelp a{color:var(--brown);text-decoration:underline;text-underline-offset:3px;transition:color .25s var(--ease)}
+.thelp a:hover{color:var(--gold)}
 
 .tfoot{
-  background:var(--ink);color:rgba(232,220,200,.6);
-  padding:24px;text-align:center;font-size:.8rem;
+  background:var(--ink);color:rgba(232,220,200,.58);
+  padding:26px 24px;text-align:center;font-size:.8rem;
+}
+
+/* ---------- motion ---------- */
+@keyframes cardIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes rowIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+@keyframes dotIn{from{opacity:0;transform:scale(.55)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(176,141,87,.34)}
+  50%{box-shadow:0 0 0 6px rgba(176,141,87,0)}
+}
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-5px)}
+  75%{transform:translateX(5px)}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+  }
 }
 
 /* ---------- responsive ---------- */
-@media (max-width:720px){
-  .tgrid{grid-template-columns:1fr}
-  .tbar__inner{padding:16px 20px}
-  .thead__title{font-size:clamp(1.8rem,8vw,2.4rem)}
+@media (max-width:760px){
+  .tgrid{grid-template-columns:1fr;gap:30px}
+  .tbar__inner{padding:14px 20px}
 }
 
-@media (max-width:520px){
-  .tstep{grid-template-columns:1fr;gap:0;padding-left:4px}
-  .tstep::before{left:11px;right:auto;top:8px;bottom:8px;width:2px;height:auto}
+@media (max-width:560px){
+  .tshell{align-items:stretch}
+  .thead{text-align:center;padding-inline:8px}
+  .thead__title{font-size:clamp(1.85rem,9vw,2.5rem)}
+  .thead__bracket{opacity:.3}
+
+  /* The stepper turns vertical, so the rail has to turn with it: the same
+     --p fraction now drives height instead of width. */
+  .tstepwrap{padding:30px 0 26px}
+  .tstep{grid-template-columns:1fr;gap:0}
+  .tstep__rail{
+    left:23px;right:auto;top:8px;bottom:8px;
+    width:2px;height:auto;
+  }
+  .tstep__fill{
+    width:100%;
+    height:calc(var(--p, 0) * 100%);
+  }
   .tstep__item{
     flex-direction:row;align-items:center;gap:16px;
-    padding-bottom:22px;
+    padding-bottom:26px;
   }
   .tstep__item:last-child{padding-bottom:0}
   .tstep__label{text-align:left}
-  .tresult__actions .btn{min-width:0;width:100%}
+  .tresult__actions .btn{min-width:0;width:100%;max-width:none}
+  .tsums{max-width:none}
+  .ttrust{gap:8px 18px;font-size:.74rem}
 }
