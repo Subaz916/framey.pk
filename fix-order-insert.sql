@@ -65,10 +65,10 @@ set search_path = public
 as $$
 declare
   item jsonb;
-  pr   record;
-  sum  bigint := 0;
-  qty  int;
-  lines int := 0;
+  v_price int;
+  v_sum   bigint := 0;
+  qty     int;
+  lines   int := 0;
 begin
   new.status := 'new';
 
@@ -91,12 +91,15 @@ begin
       raise exception 'item % is missing a product id', lines using errcode = '22023';
     end if;
 
-    select p.price into pr
+    -- A scalar variable, not `record`: assigning one column into a record and
+    -- then reading a field off it is legal but needlessly clever here.
+    v_price := null;
+    select p.price into v_price
       from public.products p
      where p.id = item ->> 'id'
        and p.active;
 
-    if not found then
+    if v_price is null then
       raise exception 'product % is not available', item ->> 'id' using errcode = '22023';
     end if;
 
@@ -105,17 +108,17 @@ begin
       raise exception 'quantity must be between 1 and 10' using errcode = '22023';
     end if;
 
-    sum := sum + pr.price::bigint * qty;
+    v_sum := v_sum + v_price::bigint * qty;
   end loop;
 
-  if sum <= 0 then
+  if v_sum <= 0 then
     raise exception 'order total must be greater than zero' using errcode = '22023';
   end if;
 
   -- The browser's numbers are never trusted. Delivery is a flat 250.
-  new.subtotal := sum;
+  new.subtotal := v_sum;
   new.delivery := 250;
-  new.total    := sum + 250;
+  new.total    := v_sum + 250;
   return new;
 end;
 $$;
@@ -141,20 +144,28 @@ select
 
 -- ---------------------------------------------------------------------------
 --  5.  STILL NOT WORKING?  Replay the storefront insert as anon.
---      This stores nothing (it rolls back). Any error it prints is your bug.
+--      This stores nothing (it rolls back). The DO block catches the failure, so
+--      this always prints a result instead of aborting the script.
 -- ---------------------------------------------------------------------------
 
 begin;
   set local role anon;
 
-  insert into public.orders
-    (order_no, name, phone, address, city, province, payment, items,
-     subtotal, delivery, total, status)
-  values
-    ('DIAG-0002', 'Diagnostic Test', '03000000000', 'Test address',
-     'Karachi', 'Sindh', 'COD',
-     '[{"id":"minimal-black-frame","name":"Minimal Black Frame","size":"8 x 10 inch","qty":1,"price":1}]'::jsonb,
-     1, 250, 251, 'new');
+  do $$
+  begin
+    insert into public.orders
+      (order_no, name, phone, address, city, province, payment, items,
+       subtotal, delivery, total, status)
+    values
+      ('DIAG-0002', 'Diagnostic Test', '03000000000', 'Test address',
+       'Karachi', 'Sindh', 'COD',
+       '[{"id":"minimal-black-frame","name":"Minimal Black Frame","size":"8 x 10 inch","qty":1,"price":1}]'::jsonb,
+       1, 1, 2, 'new');
+
+    raise notice 'RESULT: OK - checkout can store orders.';
+  exception when others then
+    raise notice 'RESULT: FAILED - % (SQLSTATE %)', sqlerrm, sqlstate;
+  end $$;
 rollback;
 
 -- If the insert above is rejected, run diagnose-order-insert.sql section 3.
