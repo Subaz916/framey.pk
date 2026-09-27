@@ -33,6 +33,21 @@ const esc = (v) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
   );
 
+/** The inverse of esc(). Display strings are escaped once at the source so the
+    render functions can interpolate them into innerHTML as-is, which means the
+    real text is gone by the time anything else sees it. Two callers need it
+    back: the toast, which assigns textContent and would otherwise show a raw
+    "&amp;" to the customer, and the order payload, which is JSON for the
+    database and was storing the entity instead of the character.
+    `&amp;` is decoded LAST, so "&amp;lt;" cannot double-decode into "<". */
+const unesc = (v) =>
+  String(v == null ? "" : v)
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, "&");
+
 /** Percentage off, e.g. 17 (null when there is no old price). */const discountOf = (p) =>
   p.oldPrice && p.oldPrice > p.price
     ? Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100)
@@ -291,6 +306,20 @@ function trapTab(e, layer) {
    -------------------------------------------------------------------------- */
 
 let toastTimer;
+
+/** A catalogue name is an SEO-length string, and a toast lives for two seconds.
+    "6 Pcs Islamic Wall Frames - Stylish Islamic Wall Art & Home Decor added to
+    cart" wrapped onto four lines inside the pill and covered the bottom of a
+    phone screen. Cut it at a word boundary: the full name is still on the
+    card, in the cart drawer and on the order itself. */
+function shortName(name, max = 24) {
+  const s = unesc(name).trim();
+  if (s.length <= max) return s;
+  const cut = s.slice(0, max);
+  const sp = cut.lastIndexOf(" ");
+  return (sp > 8 ? cut.slice(0, sp) : cut) + "…";
+}
+
 function toast(message) {
   const el = $("#toast");
   el.innerHTML =
@@ -672,7 +701,7 @@ function addToCart(id, size, qty = 1) {
 
   saveCart();
   updateCart();
-  toast(`${p.name} added to cart`);
+  toast(`${shortName(p.name)} added to cart`);
 }
 
 function removeFromCart(key) {
@@ -682,7 +711,7 @@ function removeFromCart(key) {
   updateCart();
   if (item) {
     const p = products.find((x) => sameId(x.id, item.id));
-    toast(`${p ? p.name : "Item"} removed from cart`);
+    toast(`${shortName(p ? p.name : "Item")} removed from cart`);
   }
 }
 
@@ -1571,7 +1600,7 @@ function buildOrderRow(f, orderNumber, total) {
       const p = products.find((x) => sameId(x.id, it.id)) || {};
       return {
         id: it.id,
-        name: p.name || it.id,
+        name: unesc(p.name) || it.id,
         size: it.size,
         qty: it.qty,
         price: p.price || 0
