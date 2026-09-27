@@ -816,15 +816,27 @@ h1,h2,h3,h4{font-family:var(--ff-display);font-weight:600;line-height:1.1;letter
   .pd__media img{position:static;width:100%;height:100%;object-fit:cover}
   .pd__info{padding:20px 18px 22px}
 
-  .checkout{grid-template-columns:1fr}
-  .checkout__main{padding:26px 20px;max-height:none}
-  .checkout__summary{max-height:none;order:-1;padding:20px 18px}
+  /* Stacked, the two panels are taller than the modal, and a centred flex/
+     grid child that overflows is clipped at BOTH ends with no way to scroll
+     back up (the classic place-items:center overflow trap). Hand the scroll
+     job to .checkout so the whole panel is always reachable from here down. */
+  .checkout{grid-template-columns:1fr;flex:1;min-height:0;overflow-y:auto;
+    overscroll-behavior:contain}
+  .checkout__main{padding:26px 20px;max-height:none;overflow:visible}
+  .checkout__summary{max-height:none;overflow:visible;order:-1;padding:20px 18px}
   .checkout__summary .summary-items{max-height:190px;overflow-y:auto}
 }
 
 @media (max-width:720px){
+  /* The one lever for "the whole page reads smaller on a phone". rem resolves
+     against the ROOT element, not body, so this has to be set on html or it
+     does nothing to any of the rem-based type on the site. Form fields stay
+     at 16px further down: iOS zooms anything smaller when they are focused. */
+  html{font-size:15px}
+  body{font-size:15px;line-height:1.6}
+
   .container{padding-inline:18px}
-  .section{padding:44px 0}
+  .section{padding:40px 0}
   .sec-head{flex-direction:column;align-items:flex-start;gap:11px}
   .sec-head__sub--right{text-align:left}
   .grid{gap:12px}
@@ -875,7 +887,7 @@ h1,h2,h3,h4{font-family:var(--ff-display);font-weight:600;line-height:1.1;letter
   .footer__col:last-child{grid-column:1/-1}
   .footer__bottom{flex-direction:column;align-items:flex-start;gap:6px}
 
-  .form-grid{grid-template-columns:1fr;gap:12px}
+  .form-grid{grid-template-columns:1fr;gap:10px}
 
   .drawer{width:100%}
   .drawer__body{padding:14px 16px}
@@ -886,9 +898,73 @@ h1,h2,h3,h4{font-family:var(--ff-display);font-weight:600;line-height:1.1;letter
 
   .overlay{padding:0}
   .modal{max-width:100%;max-height:100svh;height:100svh;border-radius:0}
-  .modal--success{height:auto;max-height:100svh;margin:auto}
-  .success{padding:26px 20px 20px}
-  .checkout__main,.checkout__summary{max-height:none}
+
+  /* ---- CHECKOUT ON A PHONE ----------------------------------------------
+     The modal is a fixed-height flex column and .checkout is its only child,
+     so unless the GRID scrolls, a form taller than the screen is clipped at
+     BOTH ends and "Place Order" cannot be reached at all. .checkout therefore
+     becomes the scroll container, and the summary stays pinned on top of it
+     (order:-1) as a compact strip. */
+  .checkout{
+    flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+  }
+  /* overflow:visible on both panels is what lets the sticky submit button
+     below stick to .checkout instead of to a panel that never scrolls. */
+  .checkout__main,.checkout__summary{max-height:none;overflow:visible}
+  .checkout__main{padding:18px 16px 20px}
+  .checkout__summary{padding:16px 16px 14px}
+  .checkout__title{font-size:1.28rem}
+  .checkout__sub{font-size:.8rem;margin:4px 0 14px}
+  .checkout__summary h4{font-size:.95rem;margin-bottom:11px}
+  .sitem{grid-template-columns:38px 1fr auto;gap:8px}
+  .sitem img{width:38px;height:46px}
+  .sitem__name{font-size:.8rem}
+  .sitem__meta{font-size:.7rem}
+  .sitem__price{font-size:.8rem}
+  .sumline{font-size:.82rem;padding:4px 0}
+  .sumline--total{padding-top:9px}
+  .sumline--total strong{font-size:1.1rem}
+  .trust{margin-top:13px;padding-top:11px;gap:6px;font-size:.74rem}
+  .form-row label{font-size:.7rem;margin-bottom:5px}
+  .form-row textarea{min-height:52px}
+  .pay{margin:14px 0 12px}
+  .pay legend{margin-bottom:8px}
+  .pay__opt{padding:10px}
+  .pay__text strong{font-size:.84rem}
+  .pay__text small{font-size:.74rem}
+  .pay__legal{font-size:.7rem;margin-top:9px}
+  .checkout__error{font-size:.78rem;padding:10px 12px;margin-bottom:12px}
+
+  /* Thumb reach: "Place Order" rides the bottom of the screen instead of
+     sitting below a full screen of fields. Sticky is contained by the form,
+     so it settles back into place once the end of the form is reached. */
+  #placeOrder{position:sticky;bottom:0;z-index:3;box-shadow:var(--sh-2)}
+  .modal--checkout .modal__close{top:8px;right:8px}
+
+  /* ---- SUCCESS CARD ON A PHONE ------------------------------------------
+     A small floating card instead of a full-screen takeover, matching the
+     product dialog. The only way out of this card is the Continue Shopping
+     button, so .success scrolls: on a short or landscape screen the card
+     must never be able to push that button off the bottom. */
+  .modal--success{
+    height:auto;max-height:100svh;
+    max-width:calc(100% - 20px);margin:auto 10px;
+    border-radius:var(--r-xl);
+  }
+  .success{
+    padding:22px 18px 18px;border-radius:var(--r-xl);
+    max-height:calc(100svh - 24px);overflow-y:auto;overscroll-behavior:contain;
+  }
+  .success__tick{width:42px;height:42px;margin-bottom:11px}
+  .success__tick svg{width:20px;height:20px}
+  .success h2{font-size:1.12rem}
+  .success__msg{font-size:.8rem;margin-top:6px}
+  .success__box{margin:12px 0 2px;padding:11px 10px}
+  .success__box span{font-size:.62rem;letter-spacing:.14em}
+  .success__box strong{font-size:1.18rem;margin-top:3px}
+  .success__track{font-size:.78rem;margin-top:8px}
+  .success__amount{font-size:.78rem;margin-bottom:14px}
 
   /* Product details stays a small floating dialog on a phone instead of a
      full-screen takeover, so the shop stays visible behind it. Scoped to
@@ -916,6 +992,12 @@ h1,h2,h3,h4{font-family:var(--ff-display);font-weight:600;line-height:1.1;letter
 }
 
 @media (max-width:380px){
+  /* narrowest common phone: one more step down, so the shop and the checkout
+     fit more per screen. 14.5px is the floor - below this the labels, error
+     text and totals stop being comfortably readable. */
+  html{font-size:14.5px}
+  body{font-size:14.5px}
+
   .grid--featured,.grid--shop{grid-template-columns:repeat(2,minmax(0,1fr))}
   .cats{grid-template-columns:repeat(2,minmax(0,1fr))}
   /* two cards per row leaves ~136px of content, so trim the card internals */
@@ -927,10 +1009,15 @@ h1,h2,h3,h4{font-family:var(--ff-display);font-weight:600;line-height:1.1;letter
   .stars{font-size:.74rem;letter-spacing:.5px}
   .card__cat{font-size:.6rem;letter-spacing:.12em}
   .about__badge{position:static;margin-top:12px;display:inline-block}
+
+  .checkout__main{padding:16px 13px 18px}
+  .checkout__summary{padding:14px 13px 12px}
+  .checkout__summary .summary-items{max-height:150px}
+  .success{padding:20px 15px 16px}
 }
 
 /* long words / emails / order numbers must never force a horizontal scrollbar */
-.h1,.h2,.h3,.h4,h1,h2,h3,h4,p,span,td,th,label,legend,summary{overflow-wrap:anywhere}
+.h1,.h2,.h3,.h4,h1,h2,h3,h4,p,span,strong,b,td,th,label,legend,summary{overflow-wrap:anywhere}
 
 /* iOS zooms any field under 16px, so keep inputs at 16px on small screens */
 @media (max-width:980px){
