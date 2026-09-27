@@ -1,0 +1,211 @@
+/* ==========================================================================
+   FRAMEY.PK — track-order.css
+   Page-specific styles for /track-order.html. Everything shared (tokens,
+   reset, buttons, brand) comes from style.css.
+   ========================================================================== */
+
+.tpage{
+  min-height:100svh;
+  display:flex;
+  flex-direction:column;
+  background:var(--cream);
+}
+
+/* ---------- top bar ---------- */
+.tbar{background:var(--ink);color:var(--cream)}
+.tbar__inner{
+  width:100%;max-width:var(--wrap);margin-inline:auto;
+  padding:18px 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.tbar__back{
+  font-size:.8rem;letter-spacing:.06em;color:rgba(232,220,200,.72);
+  text-decoration:none;transition:color .3s var(--ease);
+}
+.tbar__back:hover{color:var(--gold-soft)}
+
+/* ---------- page head ---------- */
+.tmain{flex:1;padding:clamp(44px,7vw,86px) 0 clamp(56px,8vw,96px)}
+
+.thead{max-width:60ch;margin-bottom:clamp(30px,4vw,46px)}
+.thead__eyebrow{
+  font-size:.72rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:14px;
+}
+.thead__title{font-size:clamp(2rem,4.6vw,3.1rem);line-height:1.08}
+.thead__title em{font-style:italic;color:var(--gold)}
+.thead__sub{color:var(--muted);margin-top:14px;font-size:1.02rem}
+
+/* ---------- cards ---------- */
+.tcard{
+  background:var(--white);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  box-shadow:var(--sh-2);
+  padding:clamp(24px,3.4vw,38px);
+}
+.tcard--form{max-width:620px}
+.tcard--result{margin-top:22px}
+.tcard--empty{
+  margin-top:22px;max-width:620px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+}
+.tcard__h{font-size:1.22rem;margin-bottom:18px}
+
+/* ---------- form ---------- */
+.tfield{margin-bottom:20px}
+.tfield label{
+  display:block;font-size:.76rem;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--brown-2);margin-bottom:8px;
+}
+.tfield input{
+  width:100%;padding:14px 16px;font:inherit;font-size:1rem;
+  color:var(--ink);background:var(--cream);
+  border:1px solid var(--line);border-radius:var(--r-sm);
+  transition:border-color .25s var(--ease),box-shadow .25s var(--ease);
+}
+.tfield input::placeholder{color:#b3a89c}
+.tfield input:focus{
+  outline:none;border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(176,141,87,.18);
+}
+.tfield input[aria-invalid="true"]{border-color:var(--danger)}
+.tfield__hint{display:block;font-size:.78rem;color:var(--muted);margin-top:7px}
+
+.tnote{
+  font-size:.86rem;line-height:1.55;color:var(--muted);
+  padding:13px 15px;border-radius:var(--r-sm);
+  background:var(--beige-2);border:1px solid var(--line-2);
+}
+.tnote--err{
+  color:var(--danger);background:rgba(179,64,47,.07);
+  border-color:rgba(179,64,47,.26);margin:0 0 18px;
+}
+
+/* ---------- status pill ---------- */
+.tstatus{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:9px 17px;border-radius:999px;
+  font-size:.8rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
+  background:var(--beige-2);color:var(--brown);
+}
+.tstatus::before{
+  content:"";width:8px;height:8px;border-radius:50%;
+  background:currentColor;flex:none;
+}
+.tstatus--new{background:rgba(176,141,87,.15);color:#8a6a35}
+.tstatus--confirmed{background:rgba(47,107,79,.13);color:var(--ok)}
+.tstatus--shipped{background:rgba(58,46,37,.12);color:var(--brown)}
+.tstatus--delivered{background:rgba(47,107,79,.15);color:var(--ok)}
+.tstatus--cancelled{background:rgba(179,64,47,.12);color:var(--danger)}
+
+/* ---------- progress stepper ---------- */
+.tstep{
+  list-style:none;display:grid;grid-template-columns:repeat(4,1fr);
+  gap:8px;margin:30px 0 6px;position:relative;
+}
+/* the connecting rail sits behind the dots */
+.tstep::before{
+  content:"";position:absolute;left:12.5%;right:12.5%;top:7px;
+  height:2px;background:var(--line);
+}
+.tstep__item{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px}
+.tstep__dot{
+  width:16px;height:16px;border-radius:50%;
+  background:var(--white);border:2px solid var(--line);
+  position:relative;z-index:1;
+}
+.tstep__label{
+  font-size:.76rem;color:var(--muted);text-align:center;line-height:1.35;
+}
+.tstep__item.is-done .tstep__dot{background:var(--gold);border-color:var(--gold)}
+.tstep__item.is-done .tstep__label{color:var(--brown)}
+.tstep__item.is-now .tstep__dot{
+  background:var(--gold);border-color:var(--gold);
+  box-shadow:0 0 0 5px rgba(176,141,87,.2);
+}
+.tstep__item.is-now .tstep__label{color:var(--ink);font-weight:600}
+
+/* ---------- two-column detail grid ---------- */
+.tgrid{
+  display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(24px,3vw,40px);
+  margin-top:34px;padding-top:30px;border-top:1px solid var(--line-2);
+}
+
+/* ---------- definition list ---------- */
+.tdl{display:grid;gap:16px}
+.tdl > div{display:flex;flex-direction:column;gap:4px}
+.tdl dt{
+  font-size:.72rem;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);
+}
+.tdl dd{font-size:1rem;color:var(--ink)}
+.tdl dd.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+
+/* ---------- items ---------- */
+.titems__list{list-style:none;display:grid;gap:14px}
+.titems__row{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:18px;
+  padding-bottom:14px;border-bottom:1px solid var(--line-2);
+}
+.titems__row:last-child{border-bottom:0;padding-bottom:0}
+.titems__main{display:flex;flex-direction:column;gap:4px;min-width:0}
+.titems__name{font-size:.98rem;color:var(--ink)}
+.titems__meta{font-size:.78rem;color:var(--muted)}
+.titems__price{font-size:.98rem;color:var(--ink);white-space:nowrap}
+
+.tsums{margin-top:22px;display:grid;gap:11px}
+.tsums__row{
+  display:flex;justify-content:space-between;gap:16px;
+  font-size:.88rem;color:var(--muted);
+}
+.tsums__row strong{color:var(--ink);font-weight:500}
+.tsums__row--total{
+  margin-top:6px;padding-top:14px;border-top:1px solid var(--line);
+  font-size:1rem;color:var(--ink);
+}
+.tsums__row--total strong{font-size:1.16rem;font-weight:600}
+
+/* ---------- empty state ---------- */
+.tempty__mark{
+  display:grid;place-items:center;width:56px;height:56px;
+  border-radius:50%;background:var(--beige-2);color:var(--muted);
+}
+.tempty__msg{font-size:.94rem;color:var(--muted);max-width:46ch;line-height:1.6}
+
+.tresult__actions{
+  display:flex;flex-wrap:wrap;gap:12px;
+  margin-top:30px;padding-top:26px;border-top:1px solid var(--line-2);
+}
+.tresult__actions .btn{flex:1 1 auto;min-width:170px}
+
+/* ---------- help + footer ---------- */
+.thelp{
+  margin-top:30px;font-size:.88rem;color:var(--muted);line-height:1.7;
+  max-width:62ch;
+}
+.thelp a{color:var(--brown);text-decoration:underline;text-underline-offset:3px}
+
+.tfoot{
+  background:var(--ink);color:rgba(232,220,200,.6);
+  padding:24px;text-align:center;font-size:.8rem;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  .tgrid{grid-template-columns:1fr}
+  .tbar__inner{padding:16px 20px}
+  .thead__title{font-size:clamp(1.8rem,8vw,2.4rem)}
+}
+
+@media (max-width:520px){
+  .tstep{grid-template-columns:1fr;gap:0;padding-left:4px}
+  .tstep::before{left:11px;right:auto;top:8px;bottom:8px;width:2px;height:auto}
+  .tstep__item{
+    flex-direction:row;align-items:center;gap:16px;
+    padding-bottom:22px;
+  }
+  .tstep__item:last-child{padding-bottom:0}
+  .tstep__label{text-align:left}
+  .tresult__actions .btn{min-width:0;width:100%}
+}

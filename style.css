@@ -625,6 +625,8 @@ h1,h2,h3,h4{font-family:var(--ff-display);font-weight:600;line-height:1.1;letter
 .success__box strong{display:block;margin-top:5px;font-family:var(--ff-display);font-size:1.45rem;letter-spacing:.02em}
 .success__amount{font-size:.88rem;color:var(--muted);margin-bottom:24px}
 .success__amount strong{color:var(--ink)}
+.success__track{font-size:.84rem;color:var(--muted);margin-top:10px;line-height:1.5}
+.success__track a{color:var(--brown);text-decoration:underline;text-underline-offset:3px}
 
 /* ---------- 11. ABOUT ---------- */
 .about{display:grid;grid-template-columns:1fr 1.05fr;gap:clamp(30px,5vw,72px);align-items:center}

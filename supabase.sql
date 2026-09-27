@@ -476,4 +476,8 @@ on conflict (email) do update set note = excluded.note;
 --   2. Project Settings → API → copy Project URL and anon public key into
 --      config.js.
 --   3. Sign in at /admin-access.html.
+--
+--  The customer-facing /track-order.html page needs one more thing: the
+--  public.track_order() lookup function. Run track-order.sql as well, or the
+--  page will report that tracking is not set up.
 -- ============================================================================

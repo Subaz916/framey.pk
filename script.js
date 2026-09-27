@@ -1009,6 +1009,13 @@ function placeOrder(event) {
 
       $("#orderNumber").textContent = row.order_no;
       $("#orderTotal").textContent = rs(row.total);
+
+      // Hand the customer a direct link to tracking, with their order number
+      // already filled in. The phone number is still required — pre-filling the
+      // number is a convenience, not a way around the second check.
+      const trackLink = $("#trackLink");
+      if (trackLink) trackLink.href = "track-order.html?order=" + encodeURIComponent(row.order_no);
+
       setTimeout(() => {
         openOverlay($("#successOverlay"));
       }, 240);
