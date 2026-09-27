@@ -491,7 +491,11 @@ h1,h2,h3,h4{font-family:var(--ff-display);font-weight:600;line-height:1.1;letter
 @keyframes pop{from{opacity:0;transform:translateY(22px) scale(.97)}to{opacity:1;transform:none}}
 .modal.is-closing{animation:popOut .25s var(--ease) forwards}
 @keyframes popOut{to{opacity:0;transform:translateY(14px) scale(.98)}}
-.modal__body{overflow-y:auto;border-radius:var(--r-xl)}
+/* flex:1 + min-height:0 let this actually be the scroll container when .modal
+   is height-constrained (full-screen on phones); without it the body refuses to
+   shrink and long content spills past the viewport. */
+.modal__body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+  border-radius:var(--r-xl)}
 .modal__close{
   position:absolute;top:12px;right:12px;z-index:5;width:40px;height:40px;
   display:grid;place-items:center;border-radius:50%;font-size:1.6rem;line-height:1;
@@ -801,7 +805,11 @@ h1,h2,h3,h4{font-family:var(--ff-display);font-weight:600;line-height:1.1;letter
   .about__badge{right:16px;bottom:16px}
 
   .pd{grid-template-columns:1fr}
-  .pd__media img{min-height:190px;max-height:28svh}
+  /* Side by side, the media box is filled by an absolutely positioned image.
+     Stacked, that box has no in-flow content, so min-height:100% collapses it
+     and the image spills over the text below. Put the image back in flow. */
+  .pd__media{min-height:0;aspect-ratio:4/3;max-height:32svh;overflow:hidden}
+  .pd__media img{position:static;width:100%;height:100%;object-fit:cover}
   .pd__info{padding:20px 18px 22px}
 
   .checkout{grid-template-columns:1fr}
@@ -878,6 +886,15 @@ h1,h2,h3,h4{font-family:var(--ff-display);font-weight:600;line-height:1.1;letter
   .success{padding:26px 20px 20px}
   .checkout__main,.checkout__summary{max-height:none}
 
+  /* product details: keep the image short so the name, price and buy
+     buttons are reachable without a long scroll */
+  .pd__media{aspect-ratio:16/11;max-height:26svh}
+  .pd__info{padding:16px 15px 18px}
+  .spec{grid-template-columns:70px 1fr;gap:8px}
+  .pd__buy{flex-direction:column;gap:8px}
+  .pd__buy .btn{width:100%;min-width:0}
+  .pd__perks{gap:5px 12px}
+
   .about__badge{padding:11px 14px}
   .about__badge strong{font-size:1rem}
 }
@@ -912,7 +929,7 @@ h1,h2,h3,h4{font-family:var(--ff-display);font-weight:600;line-height:1.1;letter
   .hero__scroll{display:none}
   .section{padding:34px 0}
   .about__media img{aspect-ratio:16/10}
-  .pd__media img{min-height:0;max-height:26svh}
+  .pd__media{aspect-ratio:auto;height:26svh}
   .modal{max-height:100svh}
 }
 
