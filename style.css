@@ -586,6 +586,9 @@ h1,h2,h3,h4{font-family:var(--ff-display);font-weight:600;line-height:1.1;letter
 .pay__text strong{display:block;font-size:.95rem}
 .pay__text small{color:var(--muted);font-size:.82rem}
 .pay__legal{font-size:.76rem;color:var(--muted);text-align:center;margin-top:14px}
+.checkout__error{margin:0 0 14px;padding:12px 14px;border:1px solid rgba(179,64,47,.32);
+  border-left:3px solid var(--danger);border-radius:8px;background:rgba(179,64,47,.07);
+  color:var(--danger);font-size:.84rem;line-height:1.5}
 
 .checkout__summary{background:var(--beige-2);padding:40px 32px;overflow-y:auto;max-height:calc(100svh - 48px)}
 .checkout__summary h4{font-size:1.2rem;margin-bottom:20px}

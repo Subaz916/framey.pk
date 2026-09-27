@@ -243,6 +243,7 @@ let cart = [];            // [{ key, id, size, qty }]
 let activeProduct = null; // product currently open in the modal
 let lastFocused = null;
 let orderInFlight = false; // true between "Place Order" and the send settling
+let pendingRetry = null;   // a row the database refused, kept so a retry reuses its order_no
 
 /* Focusable selector used to keep Tab inside an open overlay or drawer. */
 const FOCUSABLE =
@@ -911,6 +912,47 @@ function generateOrderNumber() {
   return `FR-${stamp}-${rand}`;
 }
 
+/** Everything the order row is built from. Two attempts that share a signature
+ *  describe the same order, so a retry can reuse the original row — and with it
+ *  the order_no — instead of minting a second number for one purchase. */
+function orderSignature(fields) {
+  return JSON.stringify([fields, cart.map((it) => [it.id, it.size, it.qty])]);
+}
+
+function showCheckoutError(message) {
+  const el = $("#checkoutError");
+  if (!el) return;
+  el.textContent = message;
+  el.hidden = false;
+}
+
+function clearCheckoutError() {
+  const el = $("#checkoutError");
+  if (!el) return;
+  el.hidden = true;
+  el.textContent = "";
+}
+
+/** Turn a Supabase error into something a customer can act on, while keeping the
+ *  raw detail in the console for the owner. Never say the order was received. */
+function orderFailureReason(err) {
+  console.warn("FRAMEY.PK: the order was NOT stored.", err);
+  const code = String((err && err.code) || "");
+
+  if (code === "42501") {
+    return "Our order system is temporarily rejecting requests. Please try again in a moment.";
+  }
+  if (code.startsWith("22")) {
+    // The lock_order_on_insert trigger refused the row: an item id that is not
+    // on sale, or a quantity it will not accept. Only the database can fix it.
+    return "One of the items in your cart is no longer available in that quantity. Please review your cart and try again.";
+  }
+  if (!navigator.onLine) {
+    return "You appear to be offline, so the order could not be sent. Reconnect and press Try Again.";
+  }
+  return "We could not reach our order system, so your order has NOT been received yet. Please press Try Again — your cart and details have been kept.";
+}
+
 function placeOrder(event) {
   event.preventDefault();
 
@@ -923,10 +965,7 @@ function placeOrder(event) {
     return;
   }
 
-  const orderNumber = generateOrderNumber();
-  const total = cartSubtotal() + DELIVERY_FLAT;
-
-  // Snapshot the form and cart first — both are cleared immediately below.
+  // Snapshot the form and cart first — both are cleared once the send settles.
   const fields = {
     name: $("#coName").value.trim(),
     phone: $("#coPhone").value.trim(),
@@ -941,28 +980,53 @@ function placeOrder(event) {
   // Build the row HERE, synchronously, while the cart still exists. The retry
   // queue reuses this exact object much later, after the cart has been
   // emptied — rebuilding it then would send an order with no items.
-  const row = buildOrderRow(fields, orderNumber, total);
+  const sig = orderSignature(fields);
+  let row;
+  if (pendingRetry && pendingRetry.sig === sig) {
+    row = pendingRetry.row;
+  } else {
+    const orderNumber = generateOrderNumber();
+    const total = cartSubtotal() + DELIVERY_FLAT;
+    row = buildOrderRow(fields, orderNumber, total);
+  }
 
   orderInFlight = true;
+  clearCheckoutError();
   const btn = $("#placeOrder");
   if (btn) { btn.disabled = true; btn.textContent = "Placing order…"; }
 
-  closeOverlay($("#checkoutOverlay"));
+  /* The success screen used to open the instant the button was pressed, which
+   * meant a rejected insert still told the customer "Order Placed Successfully"
+   * while the order sat in a localStorage retry queue that nobody would ever
+   * read. Every lost order looked like a sale. Now the panel only claims success
+   * once the database has actually accepted the row, and a failure keeps the
+   * cart and the form so the customer can fix it with one tap. */
+  deliverOrder(row).then(
+    () => {
+      pendingRetry = null;
+      releaseOrderLock();
+      closeOverlay($("#checkoutOverlay"));
 
-  $("#orderNumber").textContent = orderNumber;
-  $("#orderTotal").textContent = rs(total);
-  setTimeout(() => {
-    openOverlay($("#successOverlay"));
-  }, 240);
+      $("#orderNumber").textContent = row.order_no;
+      $("#orderTotal").textContent = rs(row.total);
+      setTimeout(() => {
+        openOverlay($("#successOverlay"));
+      }, 240);
 
-  // Reset everything.
-  deliverOrder(row).then(releaseOrderLock, releaseOrderLock);
-
-  cart = [];
-  saveCart();
-  updateCart();
-  $("#checkoutForm").reset();
-  $$(".form-row").forEach((r) => r.classList.remove("has-error"));
+      cart = [];
+      saveCart();
+      updateCart();
+      $("#checkoutForm").reset();
+      $$(".form-row").forEach((r) => r.classList.remove("has-error"));
+    },
+    (err) => {
+      pendingRetry = { sig, row };
+      releaseOrderLock();
+      const btn2 = $("#placeOrder");
+      if (btn2) btn2.textContent = "Try Again";
+      showCheckoutError(orderFailureReason(err));
+    }
+  );
 }
 
 function releaseOrderLock() {
@@ -1247,6 +1311,24 @@ function initEvents() {
 
 const PENDING_KEY = "framey_pending_orders_v1";
 
+/** How long checkout waits for the database before calling it a failure. */
+const ORDER_SEND_TIMEOUT_MS = 15000;
+
+/** Reject `promise` if it has not settled within `ms`. */
+function withTimeout(promise, ms, message) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      const err = new Error(message);
+      err.code = "TIMEOUT";
+      reject(err);
+    }, ms);
+    promise.then(
+      (value) => { clearTimeout(timer); resolve(value); },
+      (err) => { clearTimeout(timer); reject(err); }
+    );
+  });
+}
+
 /** Supabase row (snake_case) -> the shape the rest of script.js expects.
     Display text is escaped here, at the boundary, so every innerHTML below
     can interpolate it safely. The id is left raw on purpose: it is used for
@@ -1365,6 +1447,15 @@ function insertOrder(client, payload) {
     // A retry of an order that actually landed before the connection dropped
     // trips the unique order_no. That is a success, not something to retry.
     if (res.error.code === "23505") return "duplicate";
+
+    // SQLSTATE class 22 is a data exception, and that is what the
+    // lock_order_on_insert trigger raises with (errcode 22023) when an item id
+    // is not on sale or the quantity is out of range. Re-sending the identical
+    // row can never satisfy it, so flag it as permanent — otherwise every page
+    // load burns another attempt on an order only the database can repair.
+    if (String(res.error.code || "").startsWith("22")) {
+      res.error.permanent = true;
+    }
     throw res.error;
   });
 }
@@ -1439,6 +1530,13 @@ function deliverOrder(row) {
     console.warn("FRAMEY.PK: order was not sent.", err);
     return Promise.reject(err);
   }
+  // Checkout now waits for the database before claiming success, so a request
+  // that never comes back would otherwise leave the customer staring at a
+  // disabled button forever. A stall is treated as a failure, which puts the
+  // order in the retry queue below. If the late request does land, the next
+  // boot recognises the order_no and drops it, so this cannot double-order.
+  sending = withTimeout(sending, ORDER_SEND_TIMEOUT_MS, "the database did not answer in time");
+
   return sending.catch((err) => {
     if (err && err.permanent) {
       console.warn("FRAMEY.PK: order rejected as invalid, not queued for retry.", err);
