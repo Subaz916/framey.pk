@@ -230,9 +230,9 @@
         }
         body.innerHTML = res.data.map(function (p) {
           return "<tr>" +
-            '<td><div class="cellProduct"><b>' + esc(p.name) + "</b></div></td>" +
-            '<td class="num strong">' + Number(p.units_ordered || 0) + "</td>" +
-            '<td class="num dim">' + esc(rs(p.price)) + "</td>" +
+            '<td data-label="Product"><div class="cellProduct"><b>' + esc(p.name) + "</b></div></td>" +
+            '<td class="num strong" data-label="Units">' + Number(p.units_ordered || 0) + "</td>" +
+            '<td class="num dim" data-label="Price">' + esc(rs(p.price)) + "</td>" +
             "</tr>";
         }).join("");
       });
@@ -293,12 +293,12 @@
     }
     body.innerHTML = state.orders.slice(0, 10).map(function (o) {
       return "<tr>" +
-        '<td class="mono strong">' + esc(o.order_no) + "</td>" +
-        "<td>" + esc(o.name) + "</td>" +
-        '<td class="dim">' + esc(o.city) + "</td>" +
-        '<td class="num strong">' + esc(rs(o.total)) + "</td>" +
-        "<td>" + statusPill(o.status) + "</td>" +
-        '<td class="dim nowrap">' + esc(when(o.created_at)) + "</td>" +
+        '<td class="mono strong" data-label="Order">' + esc(o.order_no) + "</td>" +
+        '<td data-label="Customer">' + esc(o.name) + "</td>" +
+        '<td class="dim" data-label="City">' + esc(o.city) + "</td>" +
+        '<td class="num strong" data-label="Total">' + esc(rs(o.total)) + "</td>" +
+        '<td data-label="Status">' + statusPill(o.status) + "</td>" +
+        '<td class="dim nowrap" data-label="Placed">' + esc(when(o.created_at)) + "</td>" +
         "</tr>";
     }).join("");
   }
@@ -325,15 +325,15 @@
 
     body.innerHTML = rows.map(function (o) {
       return "<tr>" +
-        '<td class="mono strong">' + esc(o.order_no) + "</td>" +
-        "<td>" + esc(o.name) + '<br /><span class="dim" style="font-size:.74rem">' + esc(o.province) + "</span></td>" +
-        '<td class="nowrap">' + esc(o.phone) + "</td>" +
-        '<td class="dim">' + esc(o.city) + "</td>" +
-        '<td class="num">' + itemCount(o) + "</td>" +
-        '<td class="num strong">' + esc(rs(o.total)) + "</td>" +
-        '<td>' + selectFor(o) + "</td>" +
-        '<td class="dim nowrap">' + esc(when(o.created_at)) + "</td>" +
-        '<td><div class="rowActions">' +
+        '<td class="mono strong" data-label="Order">' + esc(o.order_no) + "</td>" +
+        '<td data-label="Customer">' + esc(o.name) + '<br /><span class="dim" style="font-size:.74rem">' + esc(o.province) + "</span></td>" +
+        '<td class="nowrap" data-label="Phone">' + esc(o.phone) + "</td>" +
+        '<td class="dim" data-label="City">' + esc(o.city) + "</td>" +
+        '<td class="num" data-label="Items">' + itemCount(o) + "</td>" +
+        '<td class="num strong" data-label="Total">' + esc(rs(o.total)) + "</td>" +
+        '<td data-label="Status">' + selectFor(o) + "</td>" +
+        '<td class="dim nowrap" data-label="Placed">' + esc(when(o.created_at)) + "</td>" +
+        '<td class="act"><div class="rowActions">' +
           '<button class="iconBtn" data-view-order="' + esc(o.id) + '" type="button" title="View order" aria-label="View order ' + esc(o.order_no) + '">' +
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>' +
           "</button></div></td>" +
@@ -367,20 +367,20 @@
 
     body.innerHTML = rows.map(function (p) {
       return "<tr>" +
-        '<td><div class="cellProduct">' +
+        '<td data-label="Product"><div class="cellProduct">' +
           '<img class="thumb" src="' + esc(p.image) + '" alt="" loading="lazy" />' +
           "<span><b>" + esc(p.name) + "</b><span>" + esc(p.id) + "</span></span>" +
         "</div></td>" +
-        '<td class="dim">' + esc(p.category || "—") + "</td>" +
-        '<td class="num strong">' + esc(rs(p.price)) +
+        '<td class="dim" data-label="Category">' + esc(p.category || "—") + "</td>" +
+        '<td class="num strong" data-label="Price">' + esc(rs(p.price)) +
           (p.old_price ? '<br /><span class="dim" style="font-size:.74rem;text-decoration:line-through">' + esc(rs(p.old_price)) + "</span>" : "") +
         "</td>" +
-        '<td class="num">' + Number(p.sold || 0) + "</td>" +
-        "<td>" +
+        '<td class="num" data-label="Sold">' + Number(p.sold || 0) + "</td>" +
+        '<td data-label="Flags">' +
           (p.active ? '<span class="pill pill--confirmed">active</span>' : '<span class="pill pill--off">hidden</span>') +
           (p.featured ? ' <span class="pill pill--new">featured</span>' : "") +
         "</td>" +
-        '<td><div class="rowActions">' +
+        '<td class="act"><div class="rowActions">' +
           '<button class="iconBtn" data-edit-product="' + esc(p.id) + '" type="button" title="Edit" aria-label="Edit ' + esc(p.name) + '">' +
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.5 2.5 0 0 0-3.5-3.5L4.5 16.5V20Z"/></svg>' +
           "</button>" +
@@ -738,14 +738,14 @@
     body.innerHTML = rows.map(function (c) {
       var count = productsIn(c.slug).length;
       return "<tr>" +
-        '<td class="strong">' + esc(c.name) + "</td>" +
-        '<td class="mono">' + esc(c.slug) + "</td>" +
-        '<td class="num">' + count + "</td>" +
-        "<td>" + (c.image
+        '<td class="strong" data-label="Name">' + esc(c.name) + "</td>" +
+        '<td class="mono" data-label="URL id">' + esc(c.slug) + "</td>" +
+        '<td class="num" data-label="Products">' + count + "</td>" +
+        '<td data-label="Tile image">' + (c.image
           ? '<img class="thumb thumb--wide" src="' + esc(c.image) + '" alt="" loading="lazy" />'
           : '<span class="dim">No image</span>') + "</td>" +
-        '<td class="num">' + Number(c.sort_order || 0) + "</td>" +
-        '<td><div class="rowActions">' +
+        '<td class="num" data-label="Order">' + Number(c.sort_order || 0) + "</td>" +
+        '<td class="act"><div class="rowActions">' +
           '<button class="iconBtn" data-edit-category="' + esc(c.slug) + '" type="button" title="Edit" aria-label="Edit ' + esc(c.name) + '">' +
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.5 2.5 0 0 0-3.5-3.5L4.5 16.5V20Z"/></svg>' +
           "</button>" +
